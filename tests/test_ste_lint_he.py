@@ -165,6 +165,11 @@ class Advisory(unittest.TestCase):
     def test_hedge_with_passive_free_text(self):
         self.assertEqual(ste.lint("ייתכן שהשרת לא זמין כרגע.")[0], [])
 
+    def test_cantillation_is_stripped(self):
+        found = [f for f in ste.lint("ה֑קובץ נמחק.")[0] if f["rule"] == "passive-voice"]
+        self.assertEqual([f["col"] for f in found], [7])
+        self.assertIn("passive-voice", rules("נִמְחַ֥ק."))
+
 
 if __name__ == "__main__":
     unittest.main()

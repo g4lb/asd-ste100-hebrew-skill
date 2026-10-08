@@ -22,7 +22,7 @@ import sys
 
 HEB = "א-ת"
 # Vowel points and cantillation. Maqaf (U+05BE) stays: it is a hyphen.
-NIQQUD = re.compile(r"[ְ-ֽֿ-ׇ]")
+NIQQUD = re.compile(r"[֑-ֽֿׁ-ׂׄ-ׇׅ]")
 START = rf"(?<![{HEB}A-Za-z0-9_])"
 END = rf"(?![{HEB}A-Za-z0-9_])"
 PFX = "[ובכלמשה]{0,3}"          # prefix letters on nouns and adjectives
