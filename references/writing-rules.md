@@ -43,8 +43,8 @@ ASD-STE100 is a controlled language for English. It was first released in 1986 b
 
 | Rule ID | Level |
 |---|---|
-| `semicolon`, `sentence-length` (>20 words), `nominalization`, `marketing-word`, `prefix-hyphen`, `idiom-slang`, `synonym-rotation`, `dangling-conjunction` | hard |
-| `passive-voice`, `abbreviation`, `she-chain` | advisory |
+| `semicolon`, `sentence-length` (>20 words), `nominalization` (verb + listed action noun), `marketing-word`, `prefix-hyphen`, `idiom-slang`, `synonym-rotation`, `dangling-conjunction` | hard |
+| `nominalization` (verb + any other word, e.g. `לבצע את הפקודה`), `passive-voice`, `abbreviation`, `she-chain` | advisory |
 
 It does not check סמיכות chain length, homographs, the impersonal plural, dropped `את`, or the infinitive-only rule. Those need a morphological analyzer. Check them by hand.
 
