@@ -47,10 +47,12 @@ The rule categories come from ASD-STE100 Issue 9 (January 2025): 53 writing rule
 | One ש- clause | "הקובץ שהסוכן יצר נמצא בתיקייה." | "הקובץ שהוא יצר שלא נמצא בתיקייה שבה…" |
 | No dropped words | "למחוק את הקובץ הזמני." | "יש למחוק קובץ זמני." (which file?) |
 | Keep modality | "ייתכן שהבקשה נכשלה." stays as it is | "הבקשה נכשלה." — a hedge became a fact |
+| One hedge per uncertain claim | "ייתכן שהחיבור נכשל. ייתכן שהסיבה היא בעיה בהגדרות הפרוקסי." | "ייתכן שהחיבור נכשל בגלל בעיה בהגדרות הפרוקסי." — the source doubted both the failure and its cause |
 | Hyphen before Latin text or digits | "ב-API", "ה-JSON", "ב-2025" | "בAPI", "הJSON", "ב2025" |
 | No abbreviations | "בדרך כלל", "על פי" | "בד\"כ", "עפ\"י", "וכו'" |
 | Mixed-direction text | Code in backticks. The sentence starts with a Hebrew word | A sentence that starts with a Latin term |
 | Paragraphs and lists | One topic per paragraph, ≤6 sentences. A list for 3+ steps | A sequence hidden in one sentence |
+| Conditions next to their step | "לבדוק את הלוגים. אם יש שגיאות קריטיות: לעצור ולדווח מיד. אחרת: לדווח מה הלוגים מראים." | A stop condition placed after the step it should prevent |
 
 ### Lexical rules — direction of travel only
 
@@ -82,7 +84,7 @@ Scan for all eight before you rewrite anything:
 2. Read the input once for meaning. Do not rewrite before you know what it must still say afterward.
 3. Walk it sentence by sentence. Flag every rule violation and every checklist item. In Flavored mode, flag the lexical rules but do not enforce them. For a mechanical first pass, run `python3 scripts/ste-lint-he.py` (files or stdin, `--json` for structured output). It checks semicolons, sentence length, nominalization, marketing words, prefix hyphens, slang, synonym rotation, and dangling conjunctions in lists, plus advisory passive voice, abbreviations, ש- chains, and `לבצע` followed by a word that is not a listed action noun. It never flags hedges. It cannot check construct chains, homographs, the impersonal plural, dropped `את`, or the infinitive rule. Check those by hand.
 4. Rewrite each flagged sentence and preserve the meaning exactly. If a rewrite would drop necessary precision (a safety condition, a scope qualifier, a number), keep the longer phrasing and flag it.
-   - **Check modality before you commit to a rewrite.** `ייתכן`, `עשוי`, `אולי`, `כנראה`, and `לעיתים` carry the author's confidence. A shorter sentence that turns a hedge into a fact makes a different claim.
+   - **Check modality before you commit to a rewrite.** `ייתכן`, `עשוי`, `אולי`, `כנראה`, `לעיתים`, `אפשרי`, and attempt verbs such as `ינסה` and `מנסה` carry the author's confidence. Count the uncertain claims in the source, and keep one hedge for each claim, even when you split or merge sentences. A shorter sentence that turns a hedge into a fact makes a different claim.
    - Never add a fact the source did not state.
    - Keep the gender and number agreement correct after every change. Hebrew verbs and adjectives agree with their subject.
 5. Output the rewritten text (see Output Format).
@@ -92,7 +94,7 @@ Scan for all eight before you rewrite anything:
 
 **Default: the rewritten Hebrew text, and nothing else.** No preamble, no mode announcement, no violation count, no summary of changes, no rule table, no closing offer.
 
-The one permitted addition: if step 4 kept a longer phrasing on purpose, add one line after the text that starts with `Kept as-is:`. It names the phrase and the precision that a shorter version would lose. Leave the line out when there is nothing to report.
+The one permitted addition: if step 4 kept a longer phrasing on purpose, add one sentence after the text that starts with `Kept as-is:`. It names the phrase and the precision that a shorter version would lose. Do not use this line to explain a hedge you kept, a rule you applied, or an ambiguity you noticed. Leave the line out when there is nothing to report.
 
 **On request: the rule table.** When the user asks for the reasoning ("show the diff", "which rules did it break", "הסבר את השינויים", "לפני/אחרי"), output this instead:
 
