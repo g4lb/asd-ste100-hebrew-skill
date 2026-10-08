@@ -100,6 +100,14 @@ class Cli(unittest.TestCase):
         self.assertEqual(result.returncode, 0, result.stdout)
         pathlib.Path(fh.name).unlink()
 
+    def test_unknown_flag_exits_two(self):
+        result = run_cli("--jsn", stdin="")
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("unknown flag", result.stderr)
+
+    def test_non_ascii_digit_baseline_exits_two(self):
+        self.assertEqual(run_cli("--baseline", "²", stdin="").returncode, 2)
+
 
 class WordRules(unittest.TestCase):
     def test_maqaf_counts_as_hyphen(self):
@@ -134,6 +142,12 @@ class WordRules(unittest.TestCase):
     def test_wrinkle_is_not_slang(self):
         self.assertNotIn("idiom-slang", rules("לקמט את הנייר."))
 
+    def test_edit_a_setting_is_not_nominalization(self):
+        for text in ("לערוך הגדרת משתמש בקובץ.", "עריכת הגדרה של הפרוקסי."):
+            with self.subTest(text=text):
+                self.assertNotIn("nominalization", rules(text))
+        self.assertIn("nominalization", rules("לערוך בדיקה של הקוד."))
+
 
 class SynonymRotation(unittest.TestCase):
     def test_first_member_is_named_as_keeper(self):
@@ -147,6 +161,12 @@ class SynonymRotation(unittest.TestCase):
 
     def test_user_noun_is_not_rotation(self):
         self.assertNotIn("synonym-rotation", rules("המשתמש מנצל את המכסה."))
+
+    def test_minute_and_tester_are_not_check(self):
+        for text in ("הגיבוי רץ פעם בדקה. אחר כך לוודא שהקובץ קיים.",
+                     "הבודק הראשי מאשר. לוודא את הפלט."):
+            with self.subTest(text=text):
+                self.assertNotIn("synonym-rotation", rules(text))
 
 
 class Advisory(unittest.TestCase):
@@ -169,6 +189,18 @@ class Advisory(unittest.TestCase):
         found = [f for f in ste.lint("ה֑קובץ נמחק.")[0] if f["rule"] == "passive-voice"]
         self.assertEqual([f["col"] for f in found], [7])
         self.assertIn("passive-voice", rules("נִמְחַ֥ק."))
+
+
+    def test_present_participle_passive(self):
+        for text in ("הקבצים נשמרים בתיקייה.", "הרשומה נמחקת.", "ההודעות נשלחות בלילה."):
+            with self.subTest(text=text):
+                self.assertIn("passive-voice", rules(text))
+
+    def test_quoted_label_is_not_abbreviation(self):
+        self.assertNotIn("abbreviation", rules("ללחוץ על ב\"הגדרות\" ואז על ה\"שמור\"."))
+        for text in ("בד\"כ זה מהיר.", "המחיר כולל מע\"מ.", "עפ\"י הנוהל."):
+            with self.subTest(text=text):
+                self.assertIn("abbreviation", rules(text))
 
 
 def after_blocks(text):

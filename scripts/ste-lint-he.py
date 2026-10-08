@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 """Deterministic linter for the structural rules of Simplified Technical Hebrew.
 
-Ported from danyuchn/asd-ste100-skill (MIT). Checks only rules that a regex
-can verify without a morphological analyzer. Never flags hedges or modality
+Ported from danyuchn/asd-ste100-skill (MIT, Copyright (c) 2026 Dustin Yuchen
+Teng). Checks only rules that a regex can verify without a morphological
+analyzer. Never flags hedges or modality
 (ייתכן, עשוי, אולי, כנראה): confidence is content.
 
 Usage:
@@ -48,15 +49,22 @@ ACTION_NOUNS = alt("בדיקה", "בדיקת", "בדיקות", "השוואה", "
                    "הרחבה", "הרחבת", "אימות", "ניקוי", "שחזור", "סריקה",
                    "סריקת", "טעינה", "טעינת", "העברה", "העברת", "הפעלה",
                    "הפעלת", "חישוב", "ניתוב")
+EDIT_NOUNS = alt("בדיקה", "בדיקת", "בדיקות", "השוואה", "השוואת", "ניתוח",
+                 "סקירה", "סקירת", "ניסוי", "ניסויים", "הערכה", "הערכת",
+                 "מעקב", "חיפוש")
 NOMINAL_MSG = "Action frozen into a noun. Use the verb (לבדוק, not לבצע בדיקה)."
 
 FINAL_TO_MEDIAL = str.maketrans("ךםןףץ", "כמנפצ")
 
 
 def _with_suffixes(base):
-    """Base form, plus feminine (ה) and plural (ו). Suffixes un-final the last letter."""
+    """Base form, plus feminine (ה) and plural (ו). Suffixes un-final the last letter.
+    Nifal bases (נ...) also get the present participle: ת, ים, ות."""
     stem = base[:-1] + base[-1].translate(FINAL_TO_MEDIAL)
-    return alt(base, stem + "ה", stem + "ו")
+    forms = [base, stem + "ה", stem + "ו"]
+    if base.startswith("נ"):
+        forms += [stem + "ת", stem + "ים", stem + "ות"]
+    return alt(*forms)
 
 
 PASSIVE_BASES = [
@@ -88,7 +96,7 @@ RULES = [
      re.compile(START + PFX + NOMINAL_VERBS + rf"\s+(?:את\s+)?(?!(?:את\s+)?{PFX}{ACTION_NOUNS}{END})[{HEB}]{{2,}}"),
      "Possible nominalization. If the noun names an action, use its verb (לבדוק, not לבצע בדיקה). If it names a thing (לבצע את הפקודה), consider a precise verb such as להריץ."),
     ("nominalization", "hard",
-     re.compile(START + PFX + EDIT_VERBS + r"\s+" + PFX + ACTION_NOUNS + END),
+     re.compile(START + PFX + EDIT_VERBS + r"\s+" + PFX + EDIT_NOUNS + END),
      NOMINAL_MSG),
     ("nominalization", "hard",
      re.compile(START + PFX + alt("מתן") + r"\s+" + PFX
@@ -118,7 +126,7 @@ RULES = [
     ("passive-voice", "advisory", term(*PASSIVE_FORMS, prefix=VPFX),
      "Possible passive voice. Name the actor and use an active verb, unless the actor is unknown or irrelevant."),
     ("abbreviation", "advisory",
-     re.compile(rf"[{HEB}]+[\"״][{HEB}]+|[{HEB}]+['׳](?![{HEB}A-Za-z])"),
+     re.compile(rf"[{HEB}]+[\"״][{HEB}]{{1,2}}(?![{HEB}])|[{HEB}]+['׳](?![{HEB}A-Za-z])"),
      "Abbreviation. Write the full words (בדרך כלל, not בד\"כ)."),
 ]
 
@@ -126,7 +134,7 @@ RULES = [
 # member lists explicit inflected forms. Forms that are also common nouns
 # (משתמש = user, מראה = mirror, נציג = representative) stay out.
 SYNONYM_GROUPS = [
-    (("לבדוק", ["לבדוק", "בודק", "בודקת", "בודקים", "בודקות", "בדק", "בדקה",
+    (("לבדוק", ["לבדוק", "בודקת", "בודקים", "בודקות", "בדק",
                 "בדקו", "יבדוק", "תבדוק", "נבדוק", "בדקתי", "בדקנו"]),
      ("לוודא", ["לוודא", "לודא", "מוודא", "מוודאת", "מוודאים", "וידא", "וידאה",
                 "וידאו", "יוודא", "תוודא", "נוודא", "וידאתי", "וידאנו"]),
@@ -415,13 +423,18 @@ def main(argv):
             i += 1
             if a == "--disable":
                 disabled = set(argv[i].split(","))
-            elif argv[i].isdigit():
+            elif re.fullmatch(r"[0-9]+", argv[i]):
                 baseline = int(argv[i])
             else:
                 print(f"error: --baseline needs a whole number, got {argv[i]!r}",
                       file=sys.stderr)
                 return 2
-        elif not a.startswith("--"):
+        elif a in ("--json", "--selftest"):
+            pass
+        elif a.startswith("--"):
+            print(f"error: unknown flag {a}", file=sys.stderr)
+            return 2
+        else:
             paths.append(a)
         i += 1
 
