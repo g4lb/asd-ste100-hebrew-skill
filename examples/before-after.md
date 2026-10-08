@@ -6,13 +6,13 @@ ASD-STE100 defines English only. These rows show how each rule carries over to H
 
 | Rule | Before | After | Why |
 |---|---|---|---|
-| One word, one meaning | "לוודא את המערכת." / "לבדוק את החיבורים." / "לאמת קבלה." | "לבדוק את המערכת. לבדוק את החיבורים. לבדוק שההודעה הגיעה." | Three near-synonyms make the reader guess whether they are one action or three. |
+| One word, one meaning | "לבדוק את המערכת." / "לבחון את החיבורים." / "לאמת את הקבלה." | "לבדוק את המערכת. לבדוק את החיבורים. לבדוק את הקבלה." | Three near-synonyms make the reader guess whether they are one action or three. |
 | One part of speech per word | "לשמן את השסתום." | "למרוח שמן על השסתום." | Keep "שמן" a noun. Do not turn it into a verb. |
-| Verb, not noun (Rule 3.7) | "לבצע בדיקה של המסנן." | "לבדוק את המסנן." | `לבצע` carries no meaning. The action hides in the noun. |
+| Verb, not noun (Rule 3.7) | "לבצע בדיקה של המסנן." | "לבדוק את המסנן." | `לבצע` carries little meaning. The action hides in the noun. |
 | No idioms or slang (replaces Rule 9.3) | "לעלות על התקלה." / "לדפלי את השירות." | "למצוא את התקלה." / "לפרוס את השירות." | An idiom's meaning does not come from its words. A slang loanword has no fixed spelling. |
 | Active voice | "הקובץ נמחק." | "הסוכן מוחק את הקובץ." | The passive form hides the actor. |
 | One instruction form | "פתח את הקובץ. יש לקרוא את שורה 3. תבדוק את הפלט." | "לפתוח את הקובץ. לקרוא את שורה 3. לבדוק את הפלט." | One form, the infinitive, which is gender-neutral. |
-| Keep `את` | "יש למחוק קובץ זמני." | "למחוק את הקובץ הזמני." | Without `את` and the article, the reader cannot tell which file. |
+| Keep `את` | "למחוק קובץ ההגדרות." | "למחוק את קובץ ההגדרות." | Headline style drops `את` before a definite object. Keep it so the direct object is explicit. |
 | Hyphen before Latin text or digits | "להתקין את הגרסה בשרת הAPI." | "להתקין את הגרסה בשרת ה-API." | Without the hyphen, the prefix merges with the term. |
 | No abbreviations | "בד\"כ התהליך מסתיים תוך 5 דק'." | "בדרך כלל התהליך מסתיים תוך 5 דקות." | An abbreviation can stand for more than one phrase. |
 
@@ -28,7 +28,7 @@ These are original examples for this skill's use case. Word counts are whitespac
 
 **Violations flagged:**
 - Nominalization: "לבצע סנכרון".
-- Passive forms with no actor: "שהוגדרו", "יזוהה", "שנקבעה", "יוצג".
+- Passive verbs: "יזוהה", "יוצג". Relative clauses with a passive verb: "שהוגדרו", "שנקבעה".
 - A semicolon, and 29 words in one sentence.
 - Loanword: "קונפליקט".
 
@@ -36,7 +36,9 @@ Not flagged: "ינסה" and "ייתכן שהוא יפתור". They are hedges. T
 
 **After:**
 
-> הכלי מנסה לסנכרן את המצב בין מערכות הגיבוי המוגדרות. אם הכלי מוצא התנגשות, הוא קורא את האסטרטגיה המוגדרת. אם האסטרטגיה מתירה פתרון אוטומטי, ייתכן שהכלי יפתור את ההתנגשות בלי משתמש. אם הכלי לא פותר את ההתנגשות, הוא מדווח עליה לבדיקה ידנית.
+> הכלי מנסה לסנכרן את המצב בין מערכות הגיבוי המוגדרות. אם הכלי מזהה התנגשות, ייתכן שהוא יפתור אותה באופן אוטומטי לפי האסטרטגיה המוגדרת. אם הכלי לא פותר את ההתנגשות, הוא מציג אותה לבדיקה ידנית.
+
+"שהוגדרו" became the adjective "המוגדרות". STE permits a past participle used as an adjective. The source does not say who configured the systems, so the rewrite does not name an actor. "אחרת" became an explicit condition: the tool shows the conflict when it does not resolve it.
 
 ### Example B — Error message (Strict)
 
@@ -52,9 +54,9 @@ Not flagged: "ייתכן" and "עשויה". The system does not know the cause. 
 
 **After:**
 
-> ייתכן שהבקשה נכשלה. ייתכן שהסיבה היא פורמט נתונים שלא מתאים למה שהשרת מצפה לו. לקוח בגרסה ישנה יכול לגרום לאי-התאמה הזו. לבדוק את גרסת הלקוח.
+> ייתכן שאירעה שגיאה בעיבוד הבקשה. ייתכן שהסיבה היא אי-התאמה בפורמט הנתונים הצפוי. ייתכן שגרסת לקוח ישנה גרמה לאי-התאמה הזו.
 
-**This example is why the modality rule exists.** "הבקשה נכשלה" reads better than "ייתכן שהבקשה נכשלה", but it asserts a failure the system only suspects.
+**This example is why the modality rule exists.** "אירעה שגיאה" reads better than "ייתכן שאירעה שגיאה", but it asserts an error that the system only suspects. Each of the three hedges in the source stays a hedge. The rewrite also adds no instruction: the source does not tell the reader what to do.
 
 ### Example C — Instruction between agents (Strict)
 
@@ -69,11 +71,11 @@ Not flagged: "ייתכן" and "עשויה". The system does not know the cause. 
 
 **After:**
 
-> לחכות שהעבודה הקודמת בתהליך תסתיים בלי שגיאות. אחר כך לקרוא את קובץ הפלט. אזהרה: חריגת זמן (timeout) יכולה ליצור קובץ פלט חלקי. לבדוק שהקובץ שלם לפני שהסוכן משתמש בו.
+> לחכות שהעבודה במעלה הזרם תסתיים. אם העבודה לא העלתה שגיאות, לקרוא את תוצר הפלט. אזהרה: לפעמים חריגת זמן (timeout) יוצרת תוצר חלקי.
 
 Two deliberate choices:
-- "על הסוכן להמשיך ולצרוך" became the infinitive "לקרוא". That is correct for an instruction to the agent that does the work. Do not make the same change in descriptive text.
-- The last sentence is **new**. The source warned about partial files but did not say what to do. The check makes the warning actionable. It is added content, so this note says so. If the source left it out on purpose, delete the sentence.
+- "על הסוכן במורד הזרם להמשיך ולצרוך" became the infinitive "לקרוא". That is correct for an instruction to the agent that does the work. Do not make the same change in descriptive text.
+- "ובהנחה שלא הועלו שגיאות" became an explicit condition ("אם העבודה לא העלתה שגיאות"), not a wait for success. "לעיתים" stays as "לפעמים": the frequency hedge keeps its strength.
 
 ### Example D — README prose (Flavored)
 
@@ -88,9 +90,9 @@ Two deliberate choices:
 
 **After:**
 
-> מטמון רגיל משווה בקשות לפי טקסט זהה, ולכן שינוי קטן בניסוח גורם להחטאה. המטמון הזה משווה את המשמעות של הנחיה חדשה להנחיות שהוא כבר שומר. הוא רץ לצד המערכת הקיימת שלכם ולא שומר נתונים מחוץ לה.
+> שכבת המטמון שלנו משתלבת במערכת הקיימת שלכם ולא קושרת אתכם לספק אחד. היא משווה בקשות לפי דמיון במשמעות. כך היא מפחיתה החטאות מטמון, בעיה נפוצה בעומסי עבודה של LLM.
 
-Flavored mode kept the explanatory rhythm. It removed the marketing words, the semicolon, and the length.
+Flavored mode deleted "בצורה חלקה", "מינימום חיכוך", and "באופן דרמטי", because the source gives no measurement for them. If the source has a measured number, put the number in their place. Every other claim stays: the fit with the existing system, no vendor lock-in, comparison by meaning, and fewer cache misses.
 
 ## How to Read These Examples
 
