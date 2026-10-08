@@ -7,7 +7,7 @@ ASD-STE100 defines English only. These rows show how each rule carries over to H
 | Rule | Before | After | Why |
 |---|---|---|---|
 | One word, one meaning | "לבדוק את המערכת." / "לבחון את החיבורים." / "לאמת את הקבלה." | "לבדוק את המערכת. לבדוק את החיבורים. לבדוק את הקבלה." | Three near-synonyms make the reader guess whether they are one action or three. |
-| One part of speech per word | "לשמן את השסתום." | "למרוח שמן על השסתום." | Keep "שמן" a noun. Do not turn it into a verb. |
+| One part of speech per word | "המשתמש משתמש בכלי." | "המשתמש מפעיל את הכלי." | `משתמש` is both a noun ("user") and a verb ("uses"). Keep it a noun, and use another verb for the action. |
 | Verb, not noun (Rule 3.7) | "לבצע בדיקה של המסנן." | "לבדוק את המסנן." | `לבצע` carries little meaning. The action hides in the noun. |
 | No idioms or slang (replaces Rule 9.3) | "לעלות על התקלה." / "לדפלי את השירות." | "למצוא את התקלה." / "לפרוס את השירות." | An idiom's meaning does not come from its words. A slang loanword has no fixed spelling. |
 | Active voice | "הקובץ נמחק." | "הסוכן מוחק את הקובץ." | The passive form hides the actor. |
@@ -54,7 +54,7 @@ Not flagged: "ייתכן" and "עשויה". The system does not know the cause. 
 
 **After:**
 
-> ייתכן שאירעה שגיאה בעיבוד הבקשה. ייתכן שהסיבה היא אי-התאמה בפורמט הנתונים הצפוי. ייתכן שגרסת לקוח ישנה גרמה לאי-התאמה הזו.
+> ייתכן שאירעה שגיאה בעיבוד הבקשה. ייתכן שהסיבה היא אי-התאמה בפורמט הנתונים הצפוי. ייתכן שגרסת לקוח לא מעודכנת גרמה לאי-ההתאמה הזו.
 
 **This example is why the modality rule exists.** "אירעה שגיאה" reads better than "ייתכן שאירעה שגיאה", but it asserts an error that the system only suspects. Each of the three hedges in the source stays a hedge. The rewrite also adds no instruction: the source does not tell the reader what to do.
 
@@ -71,11 +71,11 @@ Not flagged: "ייתכן" and "עשויה". The system does not know the cause. 
 
 **After:**
 
-> לחכות שהעבודה במעלה הזרם תסתיים. אם העבודה לא העלתה שגיאות, לקרוא את תוצר הפלט. אזהרה: לפעמים חריגת זמן (timeout) יוצרת תוצר חלקי.
+> לחכות שהעבודה במעלה הזרם תסתיים. אם העבודה לא העלתה שגיאות, לקרוא את תוצר הפלט. אזהרה: במצבי חריגת זמן (timeout), לפעמים יש תוצר חלקי.
 
 Two deliberate choices:
 - "על הסוכן במורד הזרם להמשיך ולצרוך" became the infinitive "לקרוא". That is correct for an instruction to the agent that does the work. Do not make the same change in descriptive text.
-- "ובהנחה שלא הועלו שגיאות" became an explicit condition ("אם העבודה לא העלתה שגיאות"), not a wait for success. "לעיתים" stays as "לפעמים": the frequency hedge keeps its strength.
+- "ובהנחה שלא הועלו שגיאות" became an explicit condition ("אם העבודה לא העלתה שגיאות"), not a wait for success. "לעיתים" stays as "לפעמים": the frequency hedge keeps its strength. The warning keeps the source's link between timeouts and partial outputs, without claiming that the timeout causes them.
 
 ### Example D — README prose (Flavored)
 
@@ -90,9 +90,9 @@ Two deliberate choices:
 
 **After:**
 
-> שכבת המטמון שלנו משתלבת במערכת הקיימת שלכם ולא קושרת אתכם לספק אחד. היא משווה בקשות לפי דמיון במשמעות. כך היא מפחיתה החטאות מטמון, בעיה נפוצה בעומסי עבודה של LLM.
+> בנינו את שכבת המטמון שלנו כדי שתשתלב במערכת הקיימת שלכם בלי לקשור אתכם לספק אחד. היא משווה בקשות לפי דמיון במשמעות, כדי להפחית החטאות מטמון. החטאות כאלה הן בעיה נפוצה בעומסי עבודה של LLM.
 
-Flavored mode deleted "בצורה חלקה", "מינימום חיכוך", and "באופן דרמטי", because the source gives no measurement for them. If the source has a measured number, put the number in their place. Every other claim stays: the fit with the existing system, no vendor lock-in, comparison by meaning, and fewer cache misses.
+Flavored mode deleted "בצורה חלקה", "מינימום חיכוך", and "באופן דרמטי", because the source gives no measurement for them. If the source has a measured number, put the number in their place. Every other claim stays: the fit with the existing system, no vendor lock-in, comparison by meaning, and fewer cache misses. The purpose wording stays: "כדי" keeps the design intent and does not promise a result.
 
 ## How to Read These Examples
 
