@@ -171,5 +171,40 @@ class Advisory(unittest.TestCase):
         self.assertIn("passive-voice", rules("נִמְחַ֥ק."))
 
 
+def after_blocks(text):
+    """Return each blockquote that follows a '**After:**' line, joined into one string."""
+    blocks, current, active = [], [], False
+    for line in text.splitlines():
+        if line.strip() == "**After:**":
+            active, current = True, []
+            continue
+        if not active:
+            continue
+        if line.startswith(">"):
+            current.append(line.lstrip("> ").rstrip())
+        elif current:
+            blocks.append(" ".join(current))
+            active = False
+    if active and current:
+        blocks.append(" ".join(current))
+    return blocks
+
+
+class Fixtures(unittest.TestCase):
+    def test_edge_case_fixture_reports_exactly_two(self):
+        result = run_cli("--json", str(ROOT / "examples" / "linter-edge-cases.md"))
+        self.assertEqual(result.returncode, 1)
+        found = [(f["rule"], f["line"]) for f in json.loads(result.stdout)["violations"]]
+        self.assertEqual(found, [("dangling-conjunction", 7), ("dangling-conjunction", 8)])
+
+    def test_after_examples_lint_clean(self):
+        text = (ROOT / "examples" / "before-after.md").read_text(encoding="utf-8")
+        blocks = after_blocks(text)
+        self.assertEqual(len(blocks), 4)
+        for block in blocks:
+            with self.subTest(block=block[:40]):
+                self.assertEqual(ste.lint(block)[0], [])
+
+
 if __name__ == "__main__":
     unittest.main()
