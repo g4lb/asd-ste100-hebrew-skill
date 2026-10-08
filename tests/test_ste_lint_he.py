@@ -101,5 +101,25 @@ class Cli(unittest.TestCase):
         pathlib.Path(fh.name).unlink()
 
 
+class WordRules(unittest.TestCase):
+    def test_maqaf_counts_as_hyphen(self):
+        self.assertNotIn("prefix-hyphen", rules("לשלוח ל־API ב־2025."))
+
+    def test_space_before_number_is_fine(self):
+        self.assertNotIn("prefix-hyphen", rules("שלב 3 מסתיים."))
+
+    def test_noun_homographs_not_nominalization(self):
+        for text in ("ערך ברירת המחדל הוא 5.", "מבצע קיץ בחנות.",
+                     "ביצועים טובים.", "עורך הטקסט פתוח."):
+            with self.subTest(text=text):
+                self.assertNotIn("nominalization", rules(text))
+
+    def test_part_is_not_marketing(self):
+        self.assertNotIn("marketing-word", rules("חלק מהקבצים חסרים."))
+
+    def test_exceeds_is_not_slang(self):
+        self.assertNotIn("idiom-slang", rules("המספר עלה על 100."))
+
+
 if __name__ == "__main__":
     unittest.main()

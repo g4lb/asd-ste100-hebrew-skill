@@ -35,9 +35,48 @@ def term(*forms, prefix=PFX):
     return re.compile(START + prefix + alt(*forms) + END)
 
 
+NOMINAL_VERBS = alt("לבצע", "ביצוע", "ביצע", "ביצעה", "ביצעו", "יבצע", "תבצע",
+                    "נבצע", "מבצעת", "התבצע", "התבצעה", "מתבצע", "מתבצעת")
+EDIT_VERBS = alt("לערוך", "עריכת", "ערכנו", "נערוך", "יערוך", "תערוך")
+ACTION_NOUNS = alt("בדיקה", "בדיקת", "בדיקות", "השוואה", "השוואת", "ניתוח",
+                   "סקירה", "סקירת", "ניסוי", "ניסויים", "הערכה", "הערכת",
+                   "מעקב", "תיקון", "תיקונים")
+NOMINAL_MSG = "Action frozen into a noun. Use the verb (לבדוק, not לבצע בדיקה)."
+
 RULES = [
     ("semicolon", "hard", re.compile(r";"),
      "STE bans the semicolon (Rule 8.1). Split into separate sentences."),
+    ("nominalization", "hard",
+     re.compile(START + PFX + NOMINAL_VERBS + rf"\s+(?:את\s+)?[{HEB}]{{2,}}"),
+     NOMINAL_MSG),
+    ("nominalization", "hard",
+     re.compile(START + PFX + EDIT_VERBS + r"\s+" + PFX + ACTION_NOUNS + END),
+     NOMINAL_MSG),
+    ("nominalization", "hard",
+     re.compile(START + PFX + alt("מתן") + r"\s+" + PFX
+                + alt("מענה", "תמיכה", "גישה", "הרשאה", "הרשאות", "שירות") + END),
+     NOMINAL_MSG),
+    ("nominalization", "hard",
+     re.compile(START + PFX + alt("לקבל", "קבלת", "קיבל", "קיבלה", "קיבלו",
+                                  "יקבל", "נקבל") + r"\s+" + PFX
+                + alt("החלטה", "החלטות") + END),
+     NOMINAL_MSG),
+    ("marketing-word", "hard",
+     term("חדשני(?:ת|ים|ות)?", "מהפכני(?:ת|ים|ות)?", "עוצמתי(?:ת|ים|ות)?",
+          "אינטואיטיבי(?:ת|ים|ות)?", "מושלמ(?:ת|ים|ות)", "מושלם",
+          r"פורצ(?:ת|י|ות)\s+דרך", r"פורץ\s+דרך", r"בצורה\s+חלקה", r"באופן\s+חלק",
+          r"ללא\s+מאמץ", r"בלי\s+מאמץ", r"חסר(?:ת|י)?\s+תקדים",
+          r"ברמה\s+עולמית", r"מהשורה\s+הראשונה"),
+     "Marketing word. Delete it, or replace it with the measurement that earns the claim."),
+    ("prefix-hyphen", "hard",
+     re.compile(rf"(?<![{HEB}A-Za-z0-9_\-־])[ובכלמשה]{{1,3}}(?=[A-Za-z0-9])"),
+     "Hebrew prefix glued to Latin text or a digit. Add a hyphen: ב-API, ה-JSON, ב-2025."),
+    ("idiom-slang", "hard",
+     term(r"לסגור\s+פינ(?:ה|ות)", r"סוגרים\s+פינה", "לדפלי", "דיפלוי", "לקנפג",
+          "קינפוג", "מקנפג", "לדבג", "דיבוג", "מדבג", "לפשש", "לפוש", "לקמט",
+          "לטסט", "לטסטט", "סבבה", "יאללה", "בקטנה", "אחלה", r"על\s+הפנים",
+          r"חבל\s+על\s+הזמן", "תכלס", "תכל['׳]ס"),
+     "Idiom, slang, or loanword verb. Use the standard Hebrew verb (לפרוס, להגדיר, לנפות שגיאות)."),
 ]
 
 MAX_WORDS = 20  # descriptions cap. The instructions cap (16) needs context.
@@ -221,6 +260,17 @@ SELFTEST_CASES = [
      "- להגדיר את היעד\n- לרשום את התוצאה"),
     ("dangling-conjunction", "1. לפתוח את הקובץ או\n2. לסגור אותו",
      "1. לפתוח את הקובץ\n2. לסגור אותו"),
+    ("nominalization", "לבצע בדיקה של המסנן.", "לבדוק את המסנן."),
+    ("nominalization", "וביצוע עדכון למערכת.", "ביצועים טובים של המערכת."),
+    ("nominalization", "לערוך השוואה בין הגרסאות.", "לערוך את הקובץ."),
+    ("nominalization", "מתן גישה למשתמש.", "לתת גישה למשתמש."),
+    ("nominalization", "לקבל החלטה מהירה.", "לקבל גישה לשרת."),
+    ("marketing-word", "פתרון חדשני ועוצמתי.", "פתרון שמגיב תוך 20 מילישניות."),
+    ("marketing-word", "משתלב בצורה חלקה במערכת.", "חלק מהמערכת."),
+    ("prefix-hyphen", "לשלוח בקשה לAPI.", "לשלוח בקשה ל-API."),
+    ("prefix-hyphen", "השינוי נכנס ב2025.", "השינוי נכנס ב־2025."),
+    ("idiom-slang", "צריך לדפלי את השירות.", "לפרוס את השירות."),
+    ("idiom-slang", "המצב על הפנים.", "המצב גרוע."),
 ]
 
 HEDGES = "ייתכן שהבקשה נכשלה. הסיבה עשויה להיות חריגת זמן. כנראה שהדיסק מלא. אולי השרת לא זמין."
