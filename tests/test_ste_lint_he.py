@@ -149,5 +149,22 @@ class SynonymRotation(unittest.TestCase):
         self.assertNotIn("synonym-rotation", rules("המשתמש מנצל את המכסה."))
 
 
+class Advisory(unittest.TestCase):
+    def test_niqqud_does_not_hide_matches(self):
+        self.assertIn("passive-voice", rules("הַקֹּבֶץ נִמְחַק."))
+        self.assertIn("nominalization", rules("לְבַצֵּעַ בְּדִיקָה."))
+
+    def test_maqaf_survives_niqqud_removal(self):
+        self.assertNotIn("prefix-hyphen", rules("בְּ־API"))
+
+    def test_advisory_never_fails_the_run(self):
+        result = run_cli(stdin="הקובץ נמחק. בד\"כ זה מהיר.")
+        self.assertEqual(result.returncode, 0, result.stdout)
+        self.assertIn("passive-voice", result.stdout)
+
+    def test_hedge_with_passive_free_text(self):
+        self.assertEqual(ste.lint("ייתכן שהשרת לא זמין כרגע.")[0], [])
+
+
 if __name__ == "__main__":
     unittest.main()

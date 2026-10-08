@@ -21,6 +21,8 @@ import re
 import sys
 
 HEB = "א-ת"
+# Vowel points and cantillation. Maqaf (U+05BE) stays: it is a hyphen.
+NIQQUD = re.compile(r"[ְ-ֽֿ-ׇ]")
 START = rf"(?<![{HEB}A-Za-z0-9_])"
 END = rf"(?![{HEB}A-Za-z0-9_])"
 PFX = "[ובכלמשה]{0,3}"          # prefix letters on nouns and adjectives
@@ -47,6 +49,34 @@ ACTION_NOUNS = alt("בדיקה", "בדיקת", "בדיקות", "השוואה", "
                    "סריקת", "טעינה", "טעינת", "העברה", "העברת", "הפעלה",
                    "הפעלת", "חישוב", "ניתוב")
 NOMINAL_MSG = "Action frozen into a noun. Use the verb (לבדוק, not לבצע בדיקה)."
+
+FINAL_TO_MEDIAL = str.maketrans("ךםןףץ", "כמנפצ")
+
+
+def _with_suffixes(base):
+    """Base form, plus feminine (ה) and plural (ו). Suffixes un-final the last letter."""
+    stem = base[:-1] + base[-1].translate(FINAL_TO_MEDIAL)
+    return alt(base, stem + "ה", stem + "ו")
+
+
+PASSIVE_BASES = [
+    "נמחק", "נשמר", "נוצר", "נשלח", "נטען", "נפתח", "נסגר", "נבדק", "נחסם",
+    "הוגדר", "הותקן", "הוסר", "הועבר", "הוחלף", "הופעל", "הושבת", "הוצג",
+    "הוזן", "הוחזר", "הוגבל", "בוטל", "עודכן", "סומן", "אושר", "תוקן",
+    "התקבל", "יימחק", "יישמר", "ייווצר", "יישלח", "ייטען", "יוגדר", "יותקן",
+    "יוסר", "יועבר", "יוחלף", "יופעל", "יוצג", "יוחזר", "יבוטל", "יעודכן",
+    "יאושר", "יתוקן",
+]
+PASSIVE_FORMS = [_with_suffixes(b) for b in PASSIVE_BASES] + ["נדחה", "נדחו", "הועלה", "הועלו"]
+
+SHE_OPENERS = [
+    "שהוא", "שהיא", "שהם", "שהן", "שאני", "שאתה", "שאת", "שאנחנו", "שיש",
+    "שאין", "שלא", "שכל", "שזה", "שזו", "שגם", "שרק", "שבו", "שבה", "שבהם",
+    "שבהן", "שאליו", "שאליה", "שממנו", "שעליו", "שעליה", "שהיה", "שהייתה",
+    "שהיו", "שיהיה", "שתהיה", "שאינו", "שאינה", "שנמצא", "שנמצאת", "שצריך",
+    "שניתן", "שמופיע", "שמופיעה", "שמכיל", "שמכילה", "אשר",
+]
+SHE_RE = re.compile(START + "ו?" + alt(*SHE_OPENERS) + END)
 
 RULES = [
     ("semicolon", "hard", re.compile(r";"),
@@ -85,6 +115,11 @@ RULES = [
           "לטסט", "לטסטט", "סבבה", "יאללה", "בקטנה", "אחלה", r"על\s+הפנים",
           r"חבל\s+על\s+הזמן", "תכלס", "תכל['׳]ס"),
      "Idiom, slang, or loanword verb. Use the standard Hebrew verb (לפרוס, להגדיר, לנפות שגיאות)."),
+    ("passive-voice", "advisory", term(*PASSIVE_FORMS, prefix=VPFX),
+     "Possible passive voice. Name the actor and use an active verb, unless the actor is unknown or irrelevant."),
+    ("abbreviation", "advisory",
+     re.compile(rf"[{HEB}]+[\"״][{HEB}]+|[{HEB}]+['׳](?![{HEB}A-Za-z])"),
+     "Abbreviation. Write the full words (בדרך כלל, not בד\"כ)."),
 ]
 
 # One word, one meaning: verbs commonly rotated for the same action. Each
@@ -245,11 +280,11 @@ def _dangling_conjunction_findings(lines, filename):
 
 
 def lint(text, filename="<stdin>"):
-    """Return (findings, words_total)."""
+    """Return (findings, words_total). Columns refer to the text without niqqud."""
     findings = []
     words_total = 0
     in_fence = False
-    lines = text.splitlines()
+    lines = [NIQQUD.sub("", line) for line in text.splitlines()]
     table_cells = _markdown_table_cells(lines)
     seen_synonyms = {}  # (group_index, name) -> (line, col, match)
     for lineno, raw_line in enumerate(lines, 1):
@@ -281,6 +316,13 @@ def lint(text, filename="<stdin>"):
                         filename, lineno, source_column + 1, "sentence-length",
                         "hard", f"{n} words",
                         f"Sentence has {n} words (cap {MAX_WORDS}). Split it."))
+                openers = SHE_RE.findall(sentence)
+                if len(openers) >= 2:
+                    m = SHE_RE.search(line)
+                    findings.append(_finding(
+                        filename, lineno, source_column + (m.start() if m else 0) + 1,
+                        "she-chain", "advisory", " ".join(openers),
+                        "Several ש- clauses in one sentence. Keep one and split the rest into sentences."))
     for gi, group in enumerate(SYNONYM_RES):
         present = sorted((seen_synonyms[(gi, name)], name) for name, _ in group
                          if (gi, name) in seen_synonyms)
@@ -333,6 +375,11 @@ SELFTEST_CASES = [
      "לבדוק את הקובץ. לבדוק את הפלט."),
     ("synonym-rotation", "הסוכן מוחק את הקובץ. אחר כך הוא מסיר את התיקייה.",
      "הסוכן מוחק את הקובץ."),
+    ("passive-voice", "הקובץ נמחק.", "הסוכן מוחק את הקובץ."),
+    ("passive-voice", "ההגדרה עודכנה אתמול.", "המערכת מעודכנת."),
+    ("abbreviation", "בד\"כ התהליך מסתיים מהר.", "בדרך כלל התהליך מסתיים מהר."),
+    ("abbreviation", "קבצים, תיקיות וכו'.", "צ'יפ אחד."),
+    ("she-chain", "הקובץ שהוא יצר שלא נמצא בתיקייה.", "הקובץ שהסוכן יצר נמצא בתיקייה."),
 ]
 
 HEDGES = "ייתכן שהבקשה נכשלה. הסיבה עשויה להיות חריגת זמן. כנראה שהדיסק מלא. אולי השרת לא זמין."
