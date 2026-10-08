@@ -135,5 +135,19 @@ class WordRules(unittest.TestCase):
         self.assertNotIn("idiom-slang", rules("לקמט את הנייר."))
 
 
+class SynonymRotation(unittest.TestCase):
+    def test_first_member_is_named_as_keeper(self):
+        found = [f for f in ste.lint("לבדוק את הקובץ. אחר כך לוודא את הפלט.")[0]
+                 if f["rule"] == "synonym-rotation"]
+        self.assertEqual(len(found), 1)
+        self.assertIn("'לוודא' and 'לבדוק'", found[0]["message"])
+
+    def test_rotation_across_lines(self):
+        self.assertIn("synonym-rotation", rules("להציג את הרשימה.\n\nלהראות את התוצאה."))
+
+    def test_user_noun_is_not_rotation(self):
+        self.assertNotIn("synonym-rotation", rules("המשתמש מנצל את המכסה."))
+
+
 if __name__ == "__main__":
     unittest.main()

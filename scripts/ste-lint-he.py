@@ -87,6 +87,38 @@ RULES = [
      "Idiom, slang, or loanword verb. Use the standard Hebrew verb (לפרוס, להגדיר, לנפות שגיאות)."),
 ]
 
+# One word, one meaning: verbs commonly rotated for the same action. Each
+# member lists explicit inflected forms. Forms that are also common nouns
+# (משתמש = user, מראה = mirror, נציג = representative) stay out.
+SYNONYM_GROUPS = [
+    (("לבדוק", ["לבדוק", "בודק", "בודקת", "בודקים", "בודקות", "בדק", "בדקה",
+                "בדקו", "יבדוק", "תבדוק", "נבדוק", "בדקתי", "בדקנו"]),
+     ("לוודא", ["לוודא", "לודא", "מוודא", "מוודאת", "מוודאים", "וידא", "וידאה",
+                "וידאו", "יוודא", "תוודא", "נוודא", "וידאתי", "וידאנו"]),
+     ("לאמת", ["לאמת", "מאמת", "מאמתת", "מאמתים", "אימתה", "אימתו", "יאמת",
+               "תאמת", "נאמת", "אימתנו"])),
+    (("למחוק", ["למחוק", "מוחק", "מוחקת", "מוחקים", "מחק", "מחקה", "מחקו",
+                "ימחק", "תמחק", "מחקתי", "מחקנו"]),
+     ("להסיר", ["להסיר", "מסיר", "מסירים", "הסיר", "הסירה", "הסירו", "יסיר",
+                "תסיר", "נסיר", "הסרתי", "הסרנו"])),
+    (("להציג", ["להציג", "מציג", "מציגה", "מציגים", "הציג", "הציגה", "הציגו",
+                "יציג", "תציג", "הצגתי"]),
+     ("להראות", ["להראות", "מראים", "הראה", "הראתה", "הראו", "הראיתי"])),
+    (("לעצור", ["לעצור", "עוצר", "עוצרת", "עוצרים", "עצר", "עצרה", "עצרו",
+                "יעצור", "תעצור", "נעצור"]),
+     ("להפסיק", ["להפסיק", "מפסיק", "מפסיקה", "מפסיקים", "הפסיק", "הפסיקה",
+                 "הפסיקו", "יפסיק", "תפסיק", "נפסיק"])),
+    (("להשתמש", ["להשתמש", "השתמש", "השתמשה", "השתמשו", "ישתמש", "תשתמש",
+                 "נשתמש", "השתמשתי", "השתמשנו"]),
+     ("לנצל", ["לנצל", "מנצל", "מנצלת", "מנצלים", "ינצל", "תנצל", "ננצל"])),
+    (("לאחזר", ["לאחזר", "מאחזר", "מאחזרת", "מאחזרים", "אחזר", "אחזרו",
+                "יאחזר", "תאחזר", "נאחזר"]),
+     ("לשלוף", ["לשלוף", "שולף", "שולפת", "שולפים", "שלף", "שלפה", "שלפו",
+                "ישלוף", "תשלוף", "נשלוף"])),
+]
+SYNONYM_RES = [[(name, term(*forms, prefix=VPFX)) for name, forms in group]
+               for group in SYNONYM_GROUPS]
+
 MAX_WORDS = 20  # descriptions cap. The instructions cap (16) needs context.
 
 CODE_FENCE = re.compile(r"^(```|~~~)")
@@ -219,6 +251,7 @@ def lint(text, filename="<stdin>"):
     in_fence = False
     lines = text.splitlines()
     table_cells = _markdown_table_cells(lines)
+    seen_synonyms = {}  # (group_index, name) -> (line, col, match)
     for lineno, raw_line in enumerate(lines, 1):
         if CODE_FENCE.match(raw_line.strip()):
             in_fence = not in_fence
@@ -233,6 +266,14 @@ def lint(text, filename="<stdin>"):
                     findings.append(_finding(filename, lineno,
                                              source_column + m.start() + 1,
                                              rule_id, level, m.group(0), msg))
+            for gi, group in enumerate(SYNONYM_RES):
+                for name, pattern in group:
+                    if (gi, name) in seen_synonyms:
+                        continue
+                    m = pattern.search(line)
+                    if m:
+                        seen_synonyms[(gi, name)] = (
+                            lineno, source_column + m.start() + 1, m.group(0))
             for sentence in SENTENCE_SPLIT.split(line):
                 n = len(sentence.split())
                 if n > MAX_WORDS:
@@ -240,6 +281,15 @@ def lint(text, filename="<stdin>"):
                         filename, lineno, source_column + 1, "sentence-length",
                         "hard", f"{n} words",
                         f"Sentence has {n} words (cap {MAX_WORDS}). Split it."))
+    for gi, group in enumerate(SYNONYM_RES):
+        present = sorted((seen_synonyms[(gi, name)], name) for name, _ in group
+                         if (gi, name) in seen_synonyms)
+        if len(present) > 1:
+            first_name = present[0][1]
+            for (lineno, col, match), name in present[1:]:
+                findings.append(_finding(
+                    filename, lineno, col, "synonym-rotation", "hard", match,
+                    f"'{name}' and '{first_name}' name the same action. Pick one and use it every time."))
     findings.extend(_dangling_conjunction_findings(lines, filename))
     findings.sort(key=lambda f: (f["line"], f["col"]))
     return findings, words_total
@@ -279,6 +329,10 @@ SELFTEST_CASES = [
     ("prefix-hyphen", "השינוי נכנס ב2025.", "השינוי נכנס ב־2025."),
     ("idiom-slang", "צריך לדפלי את השירות.", "לפרוס את השירות."),
     ("idiom-slang", "המצב על הפנים.", "המצב גרוע."),
+    ("synonym-rotation", "לבדוק את הקובץ. אחר כך לוודא את הפלט.",
+     "לבדוק את הקובץ. לבדוק את הפלט."),
+    ("synonym-rotation", "הסוכן מוחק את הקובץ. אחר כך הוא מסיר את התיקייה.",
+     "הסוכן מוחק את הקובץ."),
 ]
 
 HEDGES = "ייתכן שהבקשה נכשלה. הסיבה עשויה להיות חריגת זמן. כנראה שהדיסק מלא. אולי השרת לא זמין."
