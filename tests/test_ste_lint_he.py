@@ -1,0 +1,105 @@
+"""Tests for scripts/ste-lint-he.py. Run: python3 -m unittest discover -s tests -v"""
+import importlib.util
+import json
+import pathlib
+import subprocess
+import sys
+import tempfile
+import unittest
+
+ROOT = pathlib.Path(__file__).resolve().parents[1]
+SCRIPT = ROOT / "scripts" / "ste-lint-he.py"
+_spec = importlib.util.spec_from_file_location("ste_lint_he", SCRIPT)
+ste = importlib.util.module_from_spec(_spec)
+_spec.loader.exec_module(ste)
+
+
+def rules(text):
+    return {f["rule"] for f in ste.lint(text)[0]}
+
+
+def run_cli(*args, stdin=""):
+    return subprocess.run([sys.executable, str(SCRIPT), *args], input=stdin,
+                          capture_output=True, text=True, encoding="utf-8")
+
+
+class SelftestCases(unittest.TestCase):
+    def test_every_case_triggers_and_clears(self):
+        for rule, bad, good in ste.SELFTEST_CASES:
+            with self.subTest(rule=rule, text=bad):
+                self.assertIn(rule, rules(bad))
+            with self.subTest(rule=rule, text=good):
+                self.assertNotIn(rule, rules(good))
+
+    def test_hedges_never_flagged(self):
+        self.assertEqual(ste.lint(ste.HEDGES)[0], [])
+
+    def test_selftest_flag(self):
+        result = run_cli("--selftest")
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("selftest OK", result.stdout)
+
+
+class Markdown(unittest.TestCase):
+    def test_code_is_skipped(self):
+        self.assertEqual(ste.lint("```\nלבצע בדיקה; ב2025\n```")[0], [])
+        self.assertEqual(ste.lint("להריץ את `a; b` עכשיו.")[0], [])
+
+    def test_fenced_and_quoted_lists_ignored(self):
+        self.assertNotIn("dangling-conjunction", rules("~~~\n- קוד או\n~~~"))
+        self.assertNotIn("dangling-conjunction", rules("> - פריט או"))
+
+    def test_table_cells_linted_separately(self):
+        cell = " ".join(["מילה"] * 15) + "."
+        table = f"| א | ב |\n| --- | --- |\n| {cell} | {cell} |"
+        self.assertNotIn("sentence-length", rules(table))
+
+    def test_crlf_line_endings(self):
+        found = ste.lint("- פריט או\r\n- פריט שני\r\n")[0]
+        self.assertEqual([(f["rule"], f["line"]) for f in found],
+                         [("dangling-conjunction", 1)])
+
+    def test_filename_label(self):
+        self.assertEqual(ste.lint("א; ב", filename="x.md")[0][0]["file"], "x.md")
+
+
+class Cli(unittest.TestCase):
+    def test_clean_stdin_exits_zero(self):
+        self.assertEqual(run_cli(stdin="לפתוח את הקובץ.").returncode, 0)
+
+    def test_hard_violation_exits_one(self):
+        self.assertEqual(run_cli(stdin="א; ב").returncode, 1)
+
+    def test_baseline_tolerates(self):
+        self.assertEqual(run_cli("--baseline", "1", stdin="א; ב").returncode, 0)
+
+    def test_disable(self):
+        self.assertEqual(run_cli("--disable", "semicolon", stdin="א; ב").returncode, 0)
+
+    def test_json_keeps_hebrew_readable(self):
+        result = run_cli("--json", stdin="- לפתוח או")
+        self.assertEqual(json.loads(result.stdout)["hard_count"], 1)
+        self.assertIn("לפתוח", result.stdout)
+
+    def test_missing_file_exits_two(self):
+        result = run_cli("no-such-file.md")
+        self.assertEqual(result.returncode, 2)
+        self.assertIn("cannot read", result.stderr)
+
+    def test_flag_without_value_exits_two(self):
+        self.assertEqual(run_cli("--baseline").returncode, 2)
+
+    def test_bad_baseline_value_exits_two(self):
+        self.assertEqual(run_cli("--baseline", "abc", stdin="").returncode, 2)
+
+    def test_utf8_bom_file(self):
+        with tempfile.NamedTemporaryFile("w", suffix=".md", encoding="utf-8-sig",
+                                         delete=False) as fh:
+            fh.write("לפתוח את הקובץ.\n")
+        result = run_cli(fh.name)
+        self.assertEqual(result.returncode, 0, result.stdout)
+        pathlib.Path(fh.name).unlink()
+
+
+if __name__ == "__main__":
+    unittest.main()
