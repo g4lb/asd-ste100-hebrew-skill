@@ -52,14 +52,14 @@ The rule categories come from ASD-STE100 Issue 9 (January 2025): 53 writing rule
 | No abbreviations | "בדרך כלל", "על פי" | "בד\"כ", "עפ\"י", "וכו'" |
 | Mixed-direction text | Code in backticks. The sentence starts with a Hebrew word | A sentence that starts with a Latin term |
 | Paragraphs and lists | One topic per paragraph, ≤6 sentences. A list for 3+ steps | A sequence hidden in one sentence |
-| Conditions next to their step | "לבדוק את הלוגים. אם יש שגיאות קריטיות: לעצור ולדווח מיד. אחרת: לדווח מה הלוגים מראים." | A stop condition placed after the step it should prevent |
+| Conditions next to their step | "לבדוק את הלוגים. אם יש שגיאות קריטיות: לעצור את כל הפעולות. לדווח מיד. אחרת: לדווח מה הלוגים מראים." | A stop condition placed after the step it should prevent |
 
 ### Lexical rules — direction of travel only
 
 | Rule | Do | Don't |
 |---|---|---|
 | One word, one meaning | Always "לבדוק" for one action | Rotating "לבדוק" / "לוודא" / "לאמת" |
-| One part of speech per word | "למרוח שמן על השסתום." | "לשמן את השסתום." |
+| One part of speech per word | "המשתמש מפעיל את הכלי." (`משתמש` stays a noun) | "המשתמש משתמש בכלי." |
 | Verb, not noun (Rule 3.7) | "לבדוק את הלוג." | "לבצע בדיקה של הלוג." / "לערוך השוואה" / "לקבל החלטה" |
 | No idioms, slang, or loanword verbs | "לפרוס", "להגדיר", "לנפות שגיאות", "למצוא" | "לדפלי", "לקנפג", "לדבג", "לעלות על" |
 | Homographs | Full spelling (כתיב מלא). Rephrase or add niqqud to one word if it is still ambiguous | "ספר", "מנהל" where both readings fit |
@@ -82,7 +82,7 @@ Scan for all eight before you rewrite anything:
 
 1. Pick the mode. Say which only when the user asked for the rule table.
 2. Read the input once for meaning. Do not rewrite before you know what it must still say afterward.
-3. Walk it sentence by sentence. Flag every rule violation and every checklist item. In Flavored mode, flag the lexical rules but do not enforce them. For a mechanical first pass, run `python3 scripts/ste-lint-he.py` (files or stdin, `--json` for structured output). It checks semicolons, sentence length, nominalization, marketing words, prefix hyphens, slang, synonym rotation, and dangling conjunctions in lists, plus advisory passive voice, abbreviations, ש- chains, and `לבצע` followed by a word that is not a listed action noun. It never flags hedges. It cannot check construct chains, homographs, the impersonal plural, dropped `את`, or the infinitive rule. Check those by hand.
+3. Walk it sentence by sentence. Flag every rule violation and every checklist item. In Flavored mode, flag the lexical rules but do not enforce them. For a mechanical first pass, run `python3 <this skill's directory>/scripts/ste-lint-he.py` (files or stdin, `--json` for structured output). It checks semicolons, sentence length, nominalization, marketing words, prefix hyphens, slang, synonym rotation, and dangling conjunctions in lists, plus advisory passive voice, abbreviations, ש- chains, and `לבצע` followed by a word that is not a listed action noun. It never flags hedges. It cannot check construct chains, homographs, the impersonal plural, dropped `את`, or the infinitive rule. Check those by hand.
 4. Rewrite each flagged sentence and preserve the meaning exactly. If a rewrite would drop necessary precision (a safety condition, a scope qualifier, a number), keep the longer phrasing and flag it.
    - **Check modality before you commit to a rewrite.** `ייתכן`, `עשוי`, `אולי`, `כנראה`, `לעיתים`, `אפשרי`, and attempt verbs such as `ינסה` and `מנסה` carry the author's confidence. Count the uncertain claims in the source, and keep one hedge for each claim, even when you split or merge sentences. A shorter sentence that turns a hedge into a fact makes a different claim.
    - Never add a fact the source did not state.
@@ -104,7 +104,7 @@ The one permitted addition: if step 4 kept a longer phrasing on purpose, add one
 | Nominalization | "לבצע בדיקה של הלוג" | "לבדוק את הלוג" |
 | Passive voice | "הקובץ נמחק" | "הסוכן מוחק את הקובץ" |
 
-Mode: Strict. 7 violations found.
+Mode: Strict. 2 violations found.
 ```
 
 Follow the table with one line about anything you did **not** simplify, and why.
@@ -130,4 +130,4 @@ Follow the table with one line about anything you did **not** simplify, and why.
 
 - **`references/writing-rules.md`**: the full mapping from STE to Hebrew, with sources.
 - **`examples/before-after.md`**: STE rules shown in Hebrew, and four examples of agent output.
-- **`scripts/ste-lint-he.py`**: a deterministic linter that uses only the Python standard library. Exit 1 when hard violations exceed `--baseline` (default 0). Advisory findings never fail the run. `--disable` silences named rules. `--selftest` asserts that `ייתכן שהבקשה נכשלה` passes clean.
+- **`scripts/ste-lint-he.py`**: a deterministic linter that uses only the Python standard library. Exit 1 when hard violations exceed `--baseline` (default 0). Advisory findings never fail the run. `--disable` silences named rules. `--selftest` asserts that `ייתכן שהבקשה נכשלה` passes clean. For Flavored text (READMEs, prose), add `--disable synonym-rotation`: synonym rotation is advisory in that mode, but the linter treats it as hard.
