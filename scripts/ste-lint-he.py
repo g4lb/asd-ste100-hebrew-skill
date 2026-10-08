@@ -40,15 +40,23 @@ NOMINAL_VERBS = alt("לבצע", "ביצוע", "ביצע", "ביצעה", "ביצ�
 EDIT_VERBS = alt("לערוך", "עריכת", "ערכנו", "נערוך", "יערוך", "תערוך")
 ACTION_NOUNS = alt("בדיקה", "בדיקת", "בדיקות", "השוואה", "השוואת", "ניתוח",
                    "סקירה", "סקירת", "ניסוי", "ניסויים", "הערכה", "הערכת",
-                   "מעקב", "תיקון", "תיקונים")
+                   "מעקב", "תיקון", "תיקונים", "עדכון", "עדכונים", "סנכרון",
+                   "התקנה", "התקנת", "הגדרה", "הגדרת", "הרצה", "הרצת",
+                   "מחיקה", "מחיקת", "שמירה", "שמירת", "גיבוי", "חיפוש",
+                   "הרחבה", "הרחבת", "אימות", "ניקוי", "שחזור", "סריקה",
+                   "סריקת", "טעינה", "טעינת", "העברה", "העברת", "הפעלה",
+                   "הפעלת", "חישוב", "ניתוב")
 NOMINAL_MSG = "Action frozen into a noun. Use the verb (לבדוק, not לבצע בדיקה)."
 
 RULES = [
     ("semicolon", "hard", re.compile(r";"),
      "STE bans the semicolon (Rule 8.1). Split into separate sentences."),
     ("nominalization", "hard",
-     re.compile(START + PFX + NOMINAL_VERBS + rf"\s+(?:את\s+)?[{HEB}]{{2,}}"),
+     re.compile(START + PFX + NOMINAL_VERBS + r"\s+(?:את\s+)?" + PFX + ACTION_NOUNS + END),
      NOMINAL_MSG),
+    ("nominalization", "advisory",
+     re.compile(START + PFX + NOMINAL_VERBS + rf"\s+(?:את\s+)?(?!(?:את\s+)?{PFX}{ACTION_NOUNS}{END})[{HEB}]{{2,}}"),
+     "Possible nominalization. If the noun names an action, use its verb (לבדוק, not לבצע בדיקה). If it names a thing (לבצע את הפקודה), consider a precise verb such as להריץ."),
     ("nominalization", "hard",
      re.compile(START + PFX + EDIT_VERBS + r"\s+" + PFX + ACTION_NOUNS + END),
      NOMINAL_MSG),
@@ -73,7 +81,7 @@ RULES = [
      "Hebrew prefix glued to Latin text or a digit. Add a hyphen: ב-API, ה-JSON, ב-2025."),
     ("idiom-slang", "hard",
      term(r"לסגור\s+פינ(?:ה|ות)", r"סוגרים\s+פינה", "לדפלי", "דיפלוי", "לקנפג",
-          "קינפוג", "מקנפג", "לדבג", "דיבוג", "מדבג", "לפשש", "לפוש", "לקמט",
+          "קינפוג", "מקנפג", "לדבג", "דיבוג", "מדבג", "לפשש", "לפוש",
           "לטסט", "לטסטט", "סבבה", "יאללה", "בקטנה", "אחלה", r"על\s+הפנים",
           r"חבל\s+על\s+הזמן", "תכלס", "תכל['׳]ס"),
      "Idiom, slang, or loanword verb. Use the standard Hebrew verb (לפרוס, להגדיר, לנפות שגיאות)."),

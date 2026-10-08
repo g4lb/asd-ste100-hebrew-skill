@@ -120,6 +120,20 @@ class WordRules(unittest.TestCase):
     def test_exceeds_is_not_slang(self):
         self.assertNotIn("idiom-slang", rules("המספר עלה על 100."))
 
+    def test_perform_with_concrete_object_is_advisory(self):
+        found = [f for f in ste.lint("לבצע את הפקודה.")[0] if f["rule"] == "nominalization"]
+        self.assertEqual([f["level"] for f in found], ["advisory"])
+        self.assertEqual(run_cli(stdin="הפקודה מתבצעת כל שעה.").returncode, 0)
+
+    def test_perform_with_action_noun_is_hard(self):
+        for text in ("לבצע בדיקה של המסנן.", "וביצוע עדכון למערכת.", "לבצע את הבדיקה."):
+            with self.subTest(text=text):
+                levels = [f["level"] for f in ste.lint(text)[0] if f["rule"] == "nominalization"]
+                self.assertEqual(levels, ["hard"])
+
+    def test_wrinkle_is_not_slang(self):
+        self.assertNotIn("idiom-slang", rules("לקמט את הנייר."))
+
 
 if __name__ == "__main__":
     unittest.main()
