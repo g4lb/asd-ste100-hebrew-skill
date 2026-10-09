@@ -12,12 +12,16 @@ This is a Hebrew port of [danyuchn/asd-ste100-skill](https://github.com/danyuchn
 
 ## Before / After
 
+<!-- ste-lint: off -->
+
 | Before | After |
 |---|---|
 | "כלי זה ינסה לבצע סנכרון של המצב בין מערכות הגיבוי השונות שהוגדרו, ובמידה שיזוהה קונפליקט, ייתכן שהוא יפתור אותו באופן אוטומטי בהתאם לאסטרטגיה שנקבעה; אחרת, הקונפליקט יוצג לבדיקה ידנית." | "הכלי מנסה לסנכרן את המצב בין מערכות הגיבוי המוגדרות. אם הכלי מזהה התנגשות, ייתכן שהוא יפתור אותה באופן אוטומטי לפי האסטרטגיה המוגדרת. אם הכלי לא פותר את ההתנגשות, הוא מציג אותה לבדיקה ידנית." |
 | "ייתכן שאירעה שגיאה במהלך עיבוד הבקשה שלך עקב אי-התאמה אפשרית בפורמט הנתונים הצפוי, אשר עשויה להיגרם כתוצאה מגרסת לקוח שאינה מעודכנת." | "ייתכן שאירעה שגיאה בעיבוד הבקשה. ייתכן שהסיבה היא אי-התאמה בפורמט הנתונים הצפוי. ייתכן שגרסת לקוח לא מעודכנת גרמה לאי-ההתאמה הזו." |
 
-The first row is a tool description. The rewrite removes `לבצע סנכרון` ("perform synchronization"), the passive forms, and the semicolon. The second row is an error message. Each of its three hedges (`ייתכן`, "it may be") stays a hedge: the system does not know the cause, and the rewrite must not pretend that it does.
+<!-- ste-lint: on -->
+
+The first row is a tool description. The rewrite removes `לבצע סנכרון` ("perform synchronization"), the passive forms, and the semicolon. The second row is an error message. Each of its three hedges (`ייתכן`, "it may be") stays a hedge. The system does not know the cause, so the rewrite must not pretend that it does.
 
 More examples, with explanations in English: [`examples/before-after.md`](examples/before-after.md).
 
@@ -57,12 +61,13 @@ echo "לבצע בדיקה של הקובץ; ב2025" | python3 scripts/ste-lint-he
 python3 scripts/ste-lint-he.py --selftest
 ```
 
-- **Hard** (fails the run): `semicolon`, `sentence-length`, `nominalization` (`לבצע` + a listed action noun), `marketing-word`, `prefix-hyphen`, `idiom-slang`, `synonym-rotation`, `dangling-conjunction` (`או`, `וגם`, or `וכן` at the end of a list item).
+- **Hard** (fails the run): `semicolon`, `sentence-length`, `nominalization`, `marketing-word`, `prefix-hyphen`, `idiom-slang`, `synonym-rotation`, and `dangling-conjunction`. Here `nominalization` means `לבצע` before a listed action noun. `dangling-conjunction` means `או`, `וגם`, or `וכן` at the end of a list item.
 - **Advisory** (never fails the run): `passive-voice`, `abbreviation`, `she-chain`, and `nominalization` when `לבצע` is followed by any other word (`לבצע את הפקודה`).
 - `--baseline N` tolerates N hard findings. `--disable rule1,rule2` silences rules. For READMEs and prose, add `--disable synonym-rotation`: in Flavored mode, synonym rotation is only advisory.
 - Exit codes: 0 pass, 1 hard findings above the baseline, 2 unreadable file or bad flag.
+- The linter skips code, YAML front matter, and any text between `<!-- ste-lint: off -->` and `<!-- ste-lint: on -->`. Put these markers around a "before" example that is bad on purpose.
 - The linter **never** flags hedges (`ייתכן`, `עשוי`, `אולי`, `כנראה`). Confidence is content.
-- The linter does **not** check construct-chain length, homographs, the impersonal plural (`מוחקים`, "one deletes"), a dropped `את`, or the infinitive rule. These need morphological analysis, so check them by hand.
+- The linter does **not** check construct-chain length, homographs, or the impersonal plural (`מוחקים`, "one deletes"). It also does not check a dropped `את` or the infinitive rule. These need morphological analysis, so check them by hand.
 - A clean result only means the structural checks found nothing. It does not prove that the rewrite kept the meaning.
 
 ## Installation
@@ -96,6 +101,10 @@ Built for: messages between agents, tool descriptions, error messages, system pr
 Not built for: creative writing, marketing copy, or English text. For English, use [asd-ste100-skill](https://github.com/danyuchn/asd-ste100-skill).
 
 The skill fixes the form of a text, not its substance. A paragraph with nothing to say comes out short, clean, and still empty.
+
+## Contributing
+
+See [`CONTRIBUTING.md`](CONTRIBUTING.md) for how to run the checks and add a linter rule. Changes are listed in [`CHANGELOG.md`](CHANGELOG.md).
 
 ## Credit and Licence
 

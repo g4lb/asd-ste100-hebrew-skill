@@ -4,7 +4,7 @@ This file maps the public rule categories of ASD-STE100 to Hebrew. It paraphrase
 
 ## What ASD-STE100 Is
 
-ASD-STE100 is a controlled language for English. It was first released in 1986 by what is now ASD (the AeroSpace and Defense Industries Association of Europe). Airlines asked for it because their maintenance staff were mostly not native English speakers, and a misread instruction on an aircraft can kill people. The current edition is Issue 9 (January 2025): 53 writing rules in 9 sections, and a dictionary of about 900 approved words.
+ASD-STE100 is a controlled language for English. It was first released in 1986 by what is now ASD (the AeroSpace and Defense Industries Association of Europe). Airlines asked for it because their maintenance staff were mostly not native English speakers. A misread instruction on an aircraft can kill people. The current edition is Issue 9 (January 2025). It has 53 writing rules in 9 sections, and a dictionary of about 900 approved words.
 
 ## Rules That Carry Over Unchanged
 
@@ -21,9 +21,9 @@ ASD-STE100 is a controlled language for English. It was first released in 1986 b
 
 | STE rule | Hebrew rule | Why it changes |
 |---|---|---|
-| ≤20 words (instructions), ≤25 words (descriptions) | ≤16 words (instructions), ≤20 words (descriptions) | Hebrew attaches ו, ה, ב, כ, ל, מ, ש to the next word, so the same content uses about 20% fewer words. |
+| ≤20 words (instructions), ≤25 words (descriptions) | ≤16 words (instructions), ≤20 words (descriptions) | Hebrew attaches ו, ה, ב, כ, ל, מ, ש to the next word. So the same content uses about 20% fewer words. |
 | Noun clusters ≤3 words | סמיכות chain ≤3 nouns (`שסתום משאבת דלק` is the limit) | A construct chain is the Hebrew noun cluster. Split a longer chain with `של` or a clause. |
-| Active voice | Avoid נפעל/פועל/הופעל/התפעל when the actor is known. Avoid the impersonal plural (`מוחקים את הקובץ`) | Both forms hide who acts. |
+| Active voice | Avoid `נפעל`/`פועל`/`הופעל`/`התפעל` when the actor is known. Avoid the impersonal plural (`מוחקים את הקובץ`) | Both forms hide who acts. |
 | Verb, not noun (Rule 3.7) | `לבדוק`, not `לבצע בדיקה של`. `להשוות`, not `לערוך השוואה`. `להחליט`, not `לקבל החלטה` | The helper verb carries no meaning. |
 | No phrasal verbs (Rule 9.3) | No idioms, slang, or loanword verbs (`לעלות על`, `לסגור פינה`, `לדפלי`, `לקנפג`, `לדבג`) | Hebrew has no phrasal verbs. Idioms and slang cause the same problem: the meaning does not come from the words. |
 | Simple tenses only | One verb form for instructions: the infinitive (`לפתוח את הקובץ`) | Hebrew has no present perfect. Its problem is mixed instruction forms (`פתח`, `פתחי`, `יש לפתוח`, `תפתח`). The infinitive is gender-neutral and standard in Israeli procedures. |
@@ -31,7 +31,7 @@ ASD-STE100 is a controlled language for English. It was first released in 1986 b
 
 ## Rules for Hebrew Only
 
-- **Homographs.** Use full spelling (כתיב מלא) as the Academy of the Hebrew Language defines it. If a word can still be read two ways (`ספר`, `מנהל`), rephrase it, or add a vowel mark (ניקוד) to that word only.
+- **Homographs.** Use full spelling (כתיב מלא) as the Academy of the Hebrew Language defines it. A word can still have two readings (`ספר`, `מנהל`). Then rephrase it, or add a vowel mark (ניקוד) to that word only.
 - **Hyphen before Latin text or digits.** `ב-API`, `ה-JSON`, `ב-2025`. A maqaf (`־`) is also correct.
 - **No abbreviations.** Write the full words: `בדרך כלל`, not `בד"כ`. `על פי`, not `עפ"י`. List the items instead of `וכו'`.
 - **Mixed-direction text.** Put code, paths, and identifiers in backticks. Do not start a sentence with a Latin term: right-to-left display moves it to the wrong end of the line.

@@ -8,16 +8,16 @@ metadata:
 
 # Simplified Technical Hebrew (based on ASD-STE100)
 
-ASD-STE100 is a controlled-language standard for English. The aerospace and defense industry built it so maintenance technicians cannot misread instructions. It removes the two biggest sources of misreading: words with more than one meaning, and sentences with more than one possible structure.
+ASD-STE100 is a controlled-language standard for English. The aerospace and defense industry built it so maintenance technicians cannot misread instructions. It removes the two biggest sources of misreading. These are words with more than one meaning, and sentences with more than one possible structure.
 
-This skill applies the same discipline to **Hebrew**. Hebrew adds its own sources of misreading: unvocalized homographs, prefix letters glued to words, long construct chains (סמיכות), chains of ש- clauses, and four competing forms for an instruction. The readers are an AI agent that parses Hebrew with no human to ask, and a human reader of technical Hebrew, including readers with weaker Hebrew.
+This skill applies the same discipline to **Hebrew**. Hebrew adds its own sources of misreading. Words can be unvocalized homographs, and prefix letters are glued to words. Construct chains (סמיכות) and chains of ש- clauses grow long. An instruction can take four competing forms. One reader is an AI agent that parses Hebrew with no human to ask. The other is a human reader of technical Hebrew, including readers with weaker Hebrew.
 
 ASD-STE100 defines English only. Every Hebrew rule below is this skill's adaptation, not an official standard.
 
 ## When to Use This Skill
 
-- Hebrew text (a tool description, an error message, an instruction between agents, a system prompt, a procedure, UI text) reads as dense, bureaucratic, or ambiguous.
-- Hebrew text goes to another agent, a translation pipeline, or a reader with weaker Hebrew, and a wrong reading has a cost.
+- Hebrew text reads as dense, bureaucratic, or ambiguous. Examples: a tool description, an error message, an instruction between agents, a system prompt, a procedure, UI text.
+- Hebrew text goes to an agent, a translation pipeline, or a reader with weaker Hebrew, and misreading has a cost.
 - The user asks for a before/after table that names each broken rule. The default output is the rewritten text alone (see Output Format).
 
 Do not use it for creative, marketing, or persuasive copy. Do not use it for English text: the English skill `asd-ste100` covers English.
@@ -32,11 +32,13 @@ Pick a mode before you rewrite. If the user does not say which, infer it from th
 
 ## Source and Scope
 
-The rule categories come from ASD-STE100 Issue 9 (January 2025): 53 writing rules in 9 sections, and a dictionary of about 900 approved English words. This skill does not reproduce that dictionary. It is free to obtain but not free to redistribute, and it is English anyway. The skill applies the principle instead: use the plainest common Hebrew word, and use it the same way every time. Full mapping and sources: `references/writing-rules.md`.
+The rule categories come from ASD-STE100 Issue 9 (January 2025). Issue 9 has 53 writing rules in 9 sections, and a dictionary of about 900 approved English words. This skill does not reproduce that dictionary. It is free to obtain but not free to redistribute, and it is English anyway. The skill applies the principle instead: use the plainest common Hebrew word, and use it the same way every time. Full mapping and sources: `references/writing-rules.md`.
 
 ## Core Rewrite Rules
 
 ### Structural rules — apply these
+
+<!-- ste-lint: off -->
 
 | Rule | Do | Don't |
 |---|---|---|
@@ -56,7 +58,11 @@ The rule categories come from ASD-STE100 Issue 9 (January 2025): 53 writing rule
 | Paragraphs and lists | One topic per paragraph, ≤6 sentences. A list for 3+ steps | A sequence hidden in one sentence |
 | Conditions next to their step | "לבדוק את הלוגים. אם יש שגיאות קריטיות: לעצור את כל הפעולות. לדווח מיד. אחרת: לדווח מה הלוגים מראים." | A stop condition placed after the step it should prevent |
 
+<!-- ste-lint: on -->
+
 ### Lexical rules — direction of travel only
+
+<!-- ste-lint: off -->
 
 | Rule | Do | Don't |
 |---|---|---|
@@ -66,6 +72,8 @@ The rule categories come from ASD-STE100 Issue 9 (January 2025): 53 writing rule
 | No idioms, slang, or loanword verbs | "לפרוס", "להגדיר", "לנפות שגיאות", "למצוא" | "לדפלי", "לקנפג", "לדבג", "לעלות על" |
 | Homographs | Full spelling (כתיב מלא). Rephrase or add niqqud to one word if it is still ambiguous | "ספר", "מנהל" where both readings fit |
 | Domain terms | Keep a necessary technical term. Define it once if it is not common Hebrew | Jargon that is never defined |
+
+<!-- ste-lint: on -->
 
 ## Scan Checklist
 
@@ -84,9 +92,9 @@ Scan for all eight before you rewrite anything:
 
 1. Pick the mode. Say which only when the user asked for the rule table.
 2. Read the input once for meaning. Do not rewrite before you know what it must still say afterward.
-3. Walk it sentence by sentence. Flag every rule violation and every checklist item. In Flavored mode, flag the lexical rules but do not enforce them. For a mechanical first pass, run `python3 <this skill's directory>/scripts/ste-lint-he.py` (files or stdin, `--json` for structured output). It checks semicolons, sentence length, nominalization, marketing words, prefix hyphens, slang, synonym rotation, and dangling conjunctions in lists, plus advisory passive voice, abbreviations, ש- chains, and `לבצע` followed by a word that is not a listed action noun. It never flags hedges. It cannot check construct chains, homographs, the impersonal plural, dropped `את`, or the infinitive rule. Check those by hand.
-4. Rewrite each flagged sentence and preserve the meaning exactly. If a rewrite would drop necessary precision (a safety condition, a scope qualifier, a number), keep the longer phrasing and flag it.
-   - **Check modality before you commit to a rewrite.** `ייתכן`, `עשוי`, `אולי`, `כנראה`, `לעיתים`, `אפשרי`, and attempt verbs such as `ינסה` and `מנסה` carry the author's confidence. Count the uncertain claims in the source, and keep one hedge for each claim, even when you split or merge sentences. A shorter sentence that turns a hedge into a fact makes a different claim.
+3. Walk it sentence by sentence. Flag every rule violation and every checklist item. In Flavored mode, flag the lexical rules but do not enforce them. For a mechanical first pass, run `python3 <this skill's directory>/scripts/ste-lint-he.py` (files or stdin, `--json` for structured output). It checks semicolons, sentence length, nominalization, marketing words, prefix hyphens, slang, synonym rotation, and dangling conjunctions in lists. Its advisory findings are passive voice, abbreviations, and ש- chains. `לבצע` before a word that is not a listed action noun is also advisory. It never flags hedges. It cannot check construct chains, homographs, the impersonal plural, dropped `את`, or the infinitive rule. Check those by hand.
+4. Rewrite each flagged sentence and preserve the meaning exactly. If a rewrite would drop necessary precision, keep the longer phrasing and flag it. Necessary precision includes a safety condition, a scope qualifier, and a number.
+   - **Check modality before you commit to a rewrite.** `ייתכן`, `עשוי`, `אולי`, `כנראה`, `לעיתים`, `אפשרי`, and attempt verbs such as `ינסה` and `מנסה` carry the author's confidence. Count the uncertain claims in the source. Keep one hedge for each claim, even when you split or merge sentences. A shorter sentence that turns a hedge into a fact makes a different claim.
    - Never add a fact the source did not state.
    - Keep the gender and number agreement correct after every change. Hebrew verbs and adjectives agree with their subject.
 5. Output the rewritten text (see Output Format).
@@ -96,15 +104,19 @@ Scan for all eight before you rewrite anything:
 
 **Default: the rewritten Hebrew text, and nothing else.** No preamble, no mode announcement, no violation count, no summary of changes, no rule table, no closing offer.
 
-The one permitted addition: if step 4 kept a longer phrasing on purpose, add one sentence after the text that starts with `Kept as-is:`. It names the phrase and the precision that a shorter version would lose. Do not use this line to explain a hedge you kept, a rule you applied, or an ambiguity you noticed. Leave the line out when there is nothing to report.
+There is one permitted addition. If step 4 kept a longer phrasing on purpose, add one sentence after the text that starts with `Kept as-is:`. It names the phrase and the precision that a shorter version would lose. Do not use this line to explain a hedge you kept, a rule you applied, or an ambiguity you noticed. Leave the line out when there is nothing to report.
 
-**On request: the rule table.** When the user asks for the reasoning ("show the diff", "which rules did it break", "הסבר את השינויים", "לפני/אחרי"), output this instead:
+**On request: the rule table.** Example requests: "show the diff", "which rules did it break", "הסבר את השינויים", "לפני/אחרי". For such a request, output this instead:
 
 ```markdown
+<!-- ste-lint: off -->
+
 | Rule violated | Original | Simplified |
 |---|---|---|
 | Nominalization | "לבצע בדיקה של הלוג" | "לבדוק את הלוג" |
 | Passive voice | "הקובץ נמחק" | "הסוכן מוחק את הקובץ" |
+
+<!-- ste-lint: on -->
 
 Mode: Strict. 2 violations found.
 ```
@@ -132,4 +144,4 @@ Follow the table with one line about anything you did **not** simplify, and why.
 
 - **`references/writing-rules.md`**: the full mapping from STE to Hebrew, with sources.
 - **`examples/before-after.md`**: STE rules shown in Hebrew, and four examples of agent output.
-- **`scripts/ste-lint-he.py`**: a deterministic linter that uses only the Python standard library. Exit 1 when hard violations exceed `--baseline` (default 0). Advisory findings never fail the run. `--disable` silences named rules. `--selftest` asserts that `ייתכן שהבקשה נכשלה` passes clean. For Flavored text (READMEs, prose), add `--disable synonym-rotation`: synonym rotation is advisory in that mode, but the linter treats it as hard.
+- **`scripts/ste-lint-he.py`**: a deterministic linter that uses only the Python standard library. Exit 1 when hard violations exceed `--baseline` (default 0). Advisory findings never fail the run. `--disable` silences named rules. `--selftest` asserts that `ייתכן שהבקשה נכשלה` passes clean. For Flavored text (READMEs, prose), add `--disable synonym-rotation`. In that mode synonym rotation is advisory, but the linter treats it as hard. The linter skips code, YAML front matter, and text between `<!-- ste-lint: off -->` and `<!-- ste-lint: on -->`.

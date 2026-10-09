@@ -4,6 +4,8 @@
 
 ASD-STE100 defines English only. These rows show how each rule carries over to Hebrew. They are illustrations, not quotes from the standard.
 
+<!-- ste-lint: off -->
+
 | Rule | Before | After | Why |
 |---|---|---|---|
 | One word, one meaning | "לבדוק את המערכת." / "לבחון את החיבורים." / "לאמת את הקבלה." | "לבדוק את המערכת. לבדוק את החיבורים. לבדוק את הקבלה." | Three near-synonyms make the reader guess whether they are one action or three. |
@@ -16,11 +18,15 @@ ASD-STE100 defines English only. These rows show how each rule carries over to H
 | Hyphen before Latin text or digits | "להתקין את הגרסה בשרת הAPI." | "להתקין את הגרסה בשרת ה-API." | Without the hyphen, the prefix merges with the term. |
 | No abbreviations | "בד\"כ התהליך מסתיים תוך 5 דק'." | "בדרך כלל התהליך מסתיים תוך 5 דקות." | An abbreviation can stand for more than one phrase. |
 
+<!-- ste-lint: on -->
+
 ## Part 2 — Applied to agent output
 
 These are original examples for this skill's use case. Word counts are whitespace-separated tokens.
 
 ### Example A — Tool description (Strict)
+
+<!-- ste-lint: off -->
 
 **Before:**
 
@@ -34,13 +40,17 @@ These are original examples for this skill's use case. Word counts are whitespac
 
 Not flagged: "ינסה" and "ייתכן שהוא יפתור". They are hedges. The rewrite must not promise success.
 
+<!-- ste-lint: on -->
+
 **After:**
 
 > הכלי מנסה לסנכרן את המצב בין מערכות הגיבוי המוגדרות. אם הכלי מזהה התנגשות, ייתכן שהוא יפתור אותה באופן אוטומטי לפי האסטרטגיה המוגדרת. אם הכלי לא פותר את ההתנגשות, הוא מציג אותה לבדיקה ידנית.
 
-"שהוגדרו" became the adjective "המוגדרות". STE permits a past participle used as an adjective. The source does not say who configured the systems, so the rewrite does not name an actor. "אחרת" became an explicit condition: the tool shows the conflict when it does not resolve it.
+`שהוגדרו` became the adjective `המוגדרות`. STE permits a past participle used as an adjective. The source does not say who configured the systems, so the rewrite does not name an actor. "אחרת" became an explicit condition: the tool shows the conflict when it does not resolve it.
 
 ### Example B — Error message (Strict)
+
+<!-- ste-lint: off -->
 
 **Before:**
 
@@ -52,6 +62,8 @@ Not flagged: "ינסה" and "ייתכן שהוא יפתור". They are hedges. T
 
 Not flagged: "ייתכן" and "עשויה". The system does not know the cause. Both hedges report that accurately.
 
+<!-- ste-lint: on -->
+
 **After:**
 
 > ייתכן שאירעה שגיאה בעיבוד הבקשה. ייתכן שהסיבה היא אי-התאמה בפורמט הנתונים הצפוי. ייתכן שגרסת לקוח לא מעודכנת גרמה לאי-ההתאמה הזו.
@@ -59,6 +71,8 @@ Not flagged: "ייתכן" and "עשויה". The system does not know the cause. 
 **This example is why the modality rule exists.** "אירעה שגיאה" reads better than "ייתכן שאירעה שגיאה", but it asserts an error that the system only suspects. Each of the three hedges in the source stays a hedge. The rewrite also adds no instruction: the source does not tell the reader what to do.
 
 ### Example C — Instruction between agents (Strict)
+
+<!-- ste-lint: off -->
 
 **Before:**
 
@@ -69,15 +83,19 @@ Not flagged: "ייתכן" and "עשויה". The system does not know the cause. 
 - Filler: "חשוב לציין ש".
 - One sentence with three facts (a condition, an action, a warning). 28 words.
 
+<!-- ste-lint: on -->
+
 **After:**
 
 > לחכות שהעבודה במעלה הזרם תסתיים. אם העבודה לא העלתה שגיאות, לקרוא את תוצר הפלט. אזהרה: במצבי חריגת זמן (timeout), לפעמים יש תוצר חלקי.
 
 Two deliberate choices:
 - "על הסוכן במורד הזרם להמשיך ולצרוך" became the infinitive "לקרוא". That is correct for an instruction to the agent that does the work. Do not make the same change in descriptive text.
-- "ובהנחה שלא הועלו שגיאות" became an explicit condition ("אם העבודה לא העלתה שגיאות"), not a wait for success. "לעיתים" stays as "לפעמים": the frequency hedge keeps its strength. The warning keeps the source's link between timeouts and partial outputs, without claiming that the timeout causes them.
+- `ובהנחה שלא הועלו שגיאות` became an explicit condition ("אם העבודה לא העלתה שגיאות"), not a wait for success. "לעיתים" stays as "לפעמים": the frequency hedge keeps its strength. The warning keeps the source's link between timeouts and partial outputs, without claiming that the timeout causes them.
 
 ### Example D — README prose (Flavored)
+
+<!-- ste-lint: off -->
 
 **Before:**
 
@@ -88,12 +106,14 @@ Two deliberate choices:
 - A semicolon, and 34 words.
 - Loanwords and slang: "סטאק", "ממנפת".
 
+<!-- ste-lint: on -->
+
 **After:**
 
 > בנינו את שכבת המטמון שלנו כדי שתשתלב במערכת הקיימת שלכם בלי לקשור אתכם לספק אחד. היא משווה בקשות לפי דמיון במשמעות, כדי להפחית החטאות מטמון. החטאות כאלה הן בעיה נפוצה בעומסי עבודה של LLM.
 
-Flavored mode deleted "בצורה חלקה", "מינימום חיכוך", and "באופן דרמטי", because the source gives no measurement for them. If the source has a measured number, put the number in their place. Every other claim stays: the fit with the existing system, no vendor lock-in, comparison by meaning, and fewer cache misses. The purpose wording stays: "כדי" keeps the design intent and does not promise a result.
+Flavored mode deleted `בצורה חלקה`, `מינימום חיכוך`, and `באופן דרמטי`, because the source gives no measurement for them. If the source has a measured number, put the number in their place. Every other claim stays: the fit with the existing system, no vendor lock-in, comparison by meaning, and fewer cache misses. The purpose wording stays: "כדי" keeps the design intent and does not promise a result.
 
 ## How to Read These Examples
 
-Part 1 shows the STE rules carried over to Hebrew. Part 2 shows the same discipline applied to agent output. One meaning per word, active voice, one instruction per sentence, and explicit conditions make Hebrew text safer for an agent and for a human reader.
+Part 1 shows the STE rules carried over to Hebrew. Part 2 shows the same discipline applied to agent output. One meaning per word, active voice, one instruction per sentence, and explicit conditions all help. They make Hebrew text safer for an agent and for a human reader.
