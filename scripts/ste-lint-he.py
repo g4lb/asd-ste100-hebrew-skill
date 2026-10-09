@@ -13,6 +13,9 @@ Usage:
     ste-lint-he.py --disable passive-voice,abbreviation FILE
     ste-lint-he.py --selftest
 
+Skips code, YAML front matter, and any region between <!-- ste-lint: off -->
+and <!-- ste-lint: on --> (for example, a "before" text that is bad on purpose).
+
 Exit 1 when hard violations exceed the baseline (default 0). Exit 2 when a
 file cannot be read or a flag has no valid value. Advisory findings never
 fail the run.
@@ -166,17 +169,24 @@ MAX_WORDS = 20  # descriptions cap. The instructions cap (16) needs context.
 
 CODE_FENCE = re.compile(r"^(```|~~~)")
 INLINE_CODE = re.compile(r"`[^`]*`")
+WORD_CHAR = re.compile(r"\w")
 LIST_ITEM_START = re.compile(
     r"^(?P<indent> {0,3})(?P<marker>[-*+]|[0-9]+[.)])(?P<gap> +)(?P<body>.*)$"
 )
 CONJUNCTION_END = re.compile(rf"(?<![{HEB}])(?:או|וגם|וכן|ו-|ו־)\s*$")
 TABLE_SEPARATOR_CELL = re.compile(r"^:?-{3,}:?$")
-SENTENCE_SPLIT = re.compile(r"(?<=[.!?])\s+")
+LINT_MARKER = re.compile(r"^<!--\s*ste-lint:\s*(off|on)\s*-->$")
+# A sentence ends at . ! or ?, also when closing markup (**, *, ), ") follows.
+SENTENCE_SPLIT = re.compile(r"(?:(?<=[.!?])|(?<=[.!?][*)\"])|(?<=[.!?]\*\*))\s+")
 
 
 def _finding(filename, line, col, rule, level, match, message):
     return {"file": filename, "line": line, "col": col, "rule": rule,
             "level": level, "match": match, "message": message}
+
+
+def _word_count(text):
+    return sum(1 for token in text.split() if WORD_CHAR.search(token))
 
 
 def _leading_spaces(line):
@@ -239,6 +249,29 @@ def _markdown_table_cells(lines):
     return table_cells
 
 
+def _blank_skipped(lines):
+    """Blank YAML front matter and <!-- ste-lint: off --> regions, keeping line numbers."""
+    out = list(lines)
+    if out and out[0].strip() == "---":
+        for end in range(1, len(out)):
+            if out[end].strip() == "---":
+                out[:end + 1] = [""] * (end + 1)
+                break
+    in_fence = False
+    skipping = False
+    for i, line in enumerate(out):
+        stripped = line.strip()
+        if CODE_FENCE.match(stripped):
+            in_fence = not in_fence
+        marker = None if in_fence else LINT_MARKER.match(stripped)
+        if marker:
+            skipping = marker.group(1) == "off"
+            out[i] = ""
+        elif skipping:
+            out[i] = ""
+    return out
+
+
 def _dangling_conjunction_findings(lines, filename):
     findings = []
     in_fence = False
@@ -292,7 +325,7 @@ def lint(text, filename="<stdin>"):
     findings = []
     words_total = 0
     in_fence = False
-    lines = [NIQQUD.sub("", line) for line in text.splitlines()]
+    lines = _blank_skipped([NIQQUD.sub("", line) for line in text.splitlines()])
     table_cells = _markdown_table_cells(lines)
     seen_synonyms = {}  # (group_index, name) -> (line, col, match)
     for lineno, raw_line in enumerate(lines, 1):
@@ -303,7 +336,9 @@ def lint(text, filename="<stdin>"):
             continue
         for segment, source_column in table_cells.get(lineno - 1, [(raw_line, 0)]):
             line = INLINE_CODE.sub("", segment)
-            words_total += len(line.split())
+            # For counting, a code span is one word and bare punctuation is none.
+            counted = INLINE_CODE.sub(" CODE ", segment)
+            words_total += _word_count(counted)
             for rule_id, level, pattern, msg in RULES:
                 for m in pattern.finditer(line):
                     findings.append(_finding(filename, lineno,
@@ -317,8 +352,8 @@ def lint(text, filename="<stdin>"):
                     if m:
                         seen_synonyms[(gi, name)] = (
                             lineno, source_column + m.start() + 1, m.group(0))
-            for sentence in SENTENCE_SPLIT.split(line):
-                n = len(sentence.split())
+            for sentence in SENTENCE_SPLIT.split(counted):
+                n = _word_count(sentence)
                 if n > MAX_WORDS:
                     findings.append(_finding(
                         filename, lineno, source_column + 1, "sentence-length",

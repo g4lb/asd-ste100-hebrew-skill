@@ -59,6 +59,41 @@ class Markdown(unittest.TestCase):
         self.assertEqual([(f["rule"], f["line"]) for f in found],
                          [("dangling-conjunction", 1)])
 
+    def test_off_on_markers_skip_a_region(self):
+        text = ("<!-- ste-lint: off -->\nלבצע בדיקה; ב2025\n<!-- ste-lint: on -->\n"
+                "לבצע בדיקה\n")
+        findings = ste.lint(text)[0]
+        self.assertEqual({f["line"] for f in findings}, {4})
+
+    def test_unclosed_off_marker_skips_to_end(self):
+        self.assertEqual(ste.lint("<!-- ste-lint: off -->\nלבצע בדיקה; ב2025\n")[0], [])
+
+    def test_off_marker_inside_code_fence_is_ignored(self):
+        text = "```\n<!-- ste-lint: off -->\n```\nלבצע בדיקה\n"
+        self.assertIn("nominalization", rules(text))
+
+    def test_yaml_front_matter_is_skipped(self):
+        text = "---\nname: x\ndescription: לבצע בדיקה; ב2025\n---\nלבדוק את הקובץ.\n"
+        self.assertEqual(ste.lint(text)[0], [])
+
+    def test_horizontal_rule_after_line_one_is_not_front_matter(self):
+        self.assertIn("semicolon", rules("טקסט.\n---\nא; ב\n---\n"))
+
+    def test_sentence_ends_before_closing_markup(self):
+        twelve = " ".join(["מילה"] * 12)
+        for close in ("**", "*", ")", '"'):
+            with self.subTest(close=close):
+                text = f"- **{twelve}.{close} {twelve}."
+                self.assertNotIn("sentence-length", rules(text))
+
+    def test_bare_punctuation_is_not_a_word(self):
+        text = " ".join(["מילה"] * 15) + " — — — — — — ."
+        self.assertNotIn("sentence-length", rules(text))
+
+    def test_inline_code_counts_as_one_word(self):
+        text = " ".join(["מילה"] * 18) + " `a` `b` `c`."
+        self.assertIn("sentence-length", rules(text))
+
     def test_filename_label(self):
         self.assertEqual(ste.lint("א; ב", filename="x.md")[0][0]["file"], "x.md")
 
