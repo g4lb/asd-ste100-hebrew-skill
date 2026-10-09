@@ -4,6 +4,8 @@ All notable changes to this project are in this file. The format follows [Keep a
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-10-09
+
 ### Added
 
 - The linter skips text between `<!-- ste-lint: off -->` and `<!-- ste-lint: on -->`, and skips YAML front matter.
@@ -22,5 +24,6 @@ All notable changes to this project are in this file. The format follows [Keep a
 
 - First public release: the `asd-ste100-hebrew` skill (`SKILL.md`, writing rules, examples) and the standard-library linter `scripts/ste-lint-he.py`.
 
-[Unreleased]: https://github.com/g4lb/asd-ste100-hebrew-skill/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/g4lb/asd-ste100-hebrew-skill/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/g4lb/asd-ste100-hebrew-skill/compare/v0.1.0...v0.2.0
 [0.1.0]: https://github.com/g4lb/asd-ste100-hebrew-skill/releases/tag/v0.1.0

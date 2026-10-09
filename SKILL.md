@@ -3,7 +3,7 @@ name: asd-ste100-hebrew
 description: "Use when Hebrew text must be parsed without a human to resolve ambiguity — tool descriptions, error messages, inter-agent instructions, system prompts, procedures, UI text — and misreading has a real cost, or when Hebrew text reads as dense, bureaucratic, hedged, or easy to misparse. Triggers: פשט את הטקסט, עברית טכנית פשוטה, STE בעברית, נסח מחדש כך שסוכן לא יטעה, simplify this Hebrew, Simplified Technical Hebrew. Not for creative or marketing copy, and not for English text."
 license: MIT
 metadata:
-  version: 0.1.0
+  version: 0.2.0
 ---
 
 # Simplified Technical Hebrew (based on ASD-STE100)
