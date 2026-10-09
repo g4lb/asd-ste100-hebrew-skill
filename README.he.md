@@ -75,6 +75,8 @@ python3 scripts/ste-lint-he.py --selftest
 
 ## התקנה
 
+### Claude Code
+
 ```bash
 npx skills add g4lb/asd-ste100-hebrew-skill
 ```
@@ -84,6 +86,14 @@ npx skills add g4lb/asd-ste100-hebrew-skill
 ```bash
 git clone https://github.com/g4lb/asd-ste100-hebrew-skill ~/.claude/skills/asd-ste100-hebrew
 ```
+
+### Claude.ai ואפליקציית Claude למחשב
+
+1. להוריד את [`asd-ste100-hebrew.zip`](https://github.com/g4lb/asd-ste100-hebrew-skill/releases/latest/download/asd-ste100-hebrew.zip) מהגרסה האחרונה.
+2. לפתוח את [Customize > Skills](https://claude.ai/customize/skills) ולהעלות את הקובץ.
+3. להפעיל את הסקיל.
+
+הקובץ מכיל רק את קובצי הסקיל: `SKILL.md`, הכללים, הדוגמאות והלינטר.
 
 ## שימוש
 
