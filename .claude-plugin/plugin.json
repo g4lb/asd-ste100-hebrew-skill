@@ -9,6 +9,8 @@
   },
   "homepage": "https://github.com/g4lb/asd-ste100-hebrew-skill",
   "repository": "https://github.com/g4lb/asd-ste100-hebrew-skill",
+  "documentationUrl": "https://github.com/g4lb/asd-ste100-hebrew-skill#readme",
+  "supportUrl": "https://github.com/g4lb/asd-ste100-hebrew-skill/issues",
   "license": "MIT",
   "keywords": [
     "hebrew",
