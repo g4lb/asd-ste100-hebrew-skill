@@ -9,8 +9,14 @@
   },
   "homepage": "https://github.com/g4lb/asd-ste100-hebrew-skill",
   "repository": "https://github.com/g4lb/asd-ste100-hebrew-skill",
-  "documentationUrl": "https://github.com/g4lb/asd-ste100-hebrew-skill#readme",
-  "supportUrl": "https://github.com/g4lb/asd-ste100-hebrew-skill/issues",
   "license": "MIT",
-  "keywords": ["hebrew", "ste100", "simplified-technical-english", "controlled-language", "plain-language", "writing"]
+  "keywords": [
+    "hebrew",
+    "ste100",
+    "simplified-technical-english",
+    "controlled-language",
+    "plain-language",
+    "writing"
+  ],
+  "icon": "./.claude-plugin/icon.png"
 }
