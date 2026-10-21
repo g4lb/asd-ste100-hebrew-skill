@@ -10,6 +10,14 @@
 
 > ASD-STE100 מגדיר אנגלית בלבד. אין גרסה רשמית בעברית. כל כללי העברית כאן הם התאמה של הפרויקט, לא תקן רשמי.
 
+## התחלה מהירה
+
+```bash
+npx skills add g4lb/asd-ste100-hebrew-skill
+```
+
+אחר כך לבקש מ-Claude: `פשט את תיאור הכלי הזה`. להתקנה ב-Claude.ai, באפליקציה למחשב או להתקנה ידנית, ראו [התקנה](#התקנה).
+
 ## לפני / אחרי
 
 <!-- ste-lint: off -->
@@ -120,5 +128,7 @@ git clone https://github.com/g4lb/asd-ste100-hebrew-skill ~/.claude/skills/asd-s
 מבוסס על [danyuchn/asd-ste100-skill](https://github.com/danyuchn/asd-ste100-skill) (MIT). הסקיל לא כולל את המילון הרשמי של ASD: מותר להשיג אותו בחינם, אבל אסור להפיץ אותו. אפשר לבקש אותו [מהאתר הרשמי](https://www.asd-ste100.org/STE_downloads.html).
 
 MIT — ראו [LICENSE](LICENSE).
+
+אם הסקיל עוזר לכם, נשמח לכוכב ⭐ למאגר. כוכבים עוזרים לאנשים אחרים למצוא אותו.
 
 </div>

@@ -10,6 +10,14 @@ The reader here is different. It can be an **AI agent** that parses Hebrew text 
 
 This is a Hebrew port of [danyuchn/asd-ste100-skill](https://github.com/danyuchn/asd-ste100-skill), which does the same for English.
 
+## Quick Start
+
+```bash
+npx skills add g4lb/asd-ste100-hebrew-skill
+```
+
+Then ask Claude: `פשט את תיאור הכלי הזה` ("simplify this tool description"). For Claude.ai, the desktop app, or a manual install, see [Installation](#installation).
+
 ## Before / After
 
 <!-- ste-lint: off -->
@@ -121,3 +129,5 @@ See [`CONTRIBUTING.md`](CONTRIBUTING.md) for how to run the checks and add a lin
 Based on [danyuchn/asd-ste100-skill](https://github.com/danyuchn/asd-ste100-skill) (MIT). This skill does not include ASD's official dictionary: it is free to obtain but not free to redistribute. You can request it from the [official site](https://www.asd-ste100.org/STE_downloads.html).
 
 MIT — see [LICENSE](LICENSE).
+
+If this skill helps you, please star the repo ⭐. Stars help other people find it.
