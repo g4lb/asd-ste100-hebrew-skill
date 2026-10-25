@@ -9,6 +9,8 @@ All notable changes to this project are in this file. The format follows [Keep a
 - Each release has an `asd-ste100-hebrew.zip` to upload in Claude.ai and the Claude desktop app. A workflow validates the skill with `skills-ref`, builds the zip, and attaches it to the release.
 - Install steps for Claude.ai and the Claude desktop app in both READMEs.
 - `.claude-plugin/plugin.json`, so the repository installs as a Claude Code plugin and can go in Anthropic's plugin directory.
+- `.cursor-plugin/plugin.json`, so the repository installs as a Cursor plugin and can go in the Cursor Marketplace.
+- Install steps for Cursor in both READMEs.
 
 ## [0.2.0] - 2026-10-09
 

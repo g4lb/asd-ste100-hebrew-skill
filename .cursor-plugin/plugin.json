@@ -1,0 +1,20 @@
+{
+  "name": "asd-ste100-hebrew",
+  "version": "0.2.0",
+  "description": "Rewrite Hebrew text so an agent or a reader cannot misread it. Based on the ASD-STE100 controlled-language standard.",
+  "author": {
+    "name": "g4lb"
+  },
+  "homepage": "https://github.com/g4lb/asd-ste100-hebrew-skill",
+  "repository": "https://github.com/g4lb/asd-ste100-hebrew-skill",
+  "license": "MIT",
+  "keywords": [
+    "hebrew",
+    "ste100",
+    "simplified-technical-english",
+    "controlled-language",
+    "plain-language",
+    "writing"
+  ],
+  "logo": ".claude-plugin/icon.png"
+}

@@ -2,7 +2,7 @@
 
 # ASD-STE100 for Hebrew — Simplified Technical Hebrew for Agent Output
 
-A Claude Code skill that rewrites dense or ambiguous **Hebrew** into simplified technical Hebrew. It is based on [ASD-STE100](https://www.asd-ste100.org/), the controlled-language standard that the aerospace industry built so that maintenance instructions cannot be misread.
+A skill for Claude Code and Cursor that rewrites dense or ambiguous **Hebrew** into simplified technical Hebrew. It is based on [ASD-STE100](https://www.asd-ste100.org/), the controlled-language standard that the aerospace industry built so that maintenance instructions cannot be misread.
 
 The reader here is different. It can be an **AI agent** that parses Hebrew text with no human to ask what the author meant. It can also be a person who reads technical Hebrew, including readers whose first language is not Hebrew.
 
@@ -16,7 +16,7 @@ This is a Hebrew port of [danyuchn/asd-ste100-skill](https://github.com/danyuchn
 npx skills add g4lb/asd-ste100-hebrew-skill
 ```
 
-Then ask Claude: `פשט את תיאור הכלי הזה` ("simplify this tool description"). For Claude.ai, the desktop app, or a manual install, see [Installation](#installation).
+Then ask Claude: `פשט את תיאור הכלי הזה` ("simplify this tool description"). For Cursor, Claude.ai, the desktop app, or a manual install, see [Installation](#installation).
 
 ## Before / After
 
@@ -99,6 +99,20 @@ git clone https://github.com/g4lb/asd-ste100-hebrew-skill ~/.claude/skills/asd-s
 3. Turn the skill on.
 
 The zip holds only the skill files: `SKILL.md`, the rules, the examples, and the linter.
+
+### Cursor
+
+```bash
+npx skills add g4lb/asd-ste100-hebrew-skill -a cursor
+```
+
+Or clone it into your Cursor skills folder:
+
+```bash
+git clone https://github.com/g4lb/asd-ste100-hebrew-skill ~/.cursor/skills/asd-ste100-hebrew
+```
+
+The skill follows the open [Agent Skills](https://agentskills.io) format, so other agents that read `SKILL.md` can use it too.
 
 ## Usage
 
