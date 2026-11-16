@@ -9,10 +9,11 @@ The project uses only the Python standard library. Python 3.9 or later works.
 ```bash
 python3 -m unittest discover -s tests -v
 python3 scripts/ste-lint-he.py --selftest
+python3 scripts/build-plugin.py --check
 python3 scripts/ste-lint-he.py --disable synonym-rotation README.md README.he.md SKILL.md CONTRIBUTING.md CHANGELOG.md examples/before-after.md references/writing-rules.md
 ```
 
-CI runs all three on every push and pull request. All three must pass.
+CI runs all four on every push and pull request. All four must pass.
 
 ## Add or change a linter rule
 
@@ -22,6 +23,10 @@ CI runs all three on every push and pull request. All three must pass.
 4. Update the rule list in `README.md`, `README.he.md`, and `SKILL.md`.
 
 Make a rule `hard` only when a regex can find the problem with very few false positives. Otherwise make it `advisory`.
+
+## Update the plugin folder
+
+The folder `plugin/` is the copy of the skill for Anthropic's plugin directory. The directory accepts code files only from Verified organizations, so `plugin/` has no linter. Do not edit `plugin/` by hand. After you change `SKILL.md`, `references/`, `examples/before-after.md`, or `.claude-plugin/`, run `python3 scripts/build-plugin.py` and commit the result.
 
 ## Rules that do not change
 

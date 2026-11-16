@@ -4,6 +4,10 @@ All notable changes to this project are in this file. The format follows [Keep a
 
 ## [Unreleased]
 
+### Added
+
+- `plugin/`, a copy of the skill without the linter, for Anthropic's plugin directory. The directory accepts code files only from Verified organizations. `scripts/build-plugin.py` makes the folder, and CI checks that it matches the root files.
+
 ## [0.2.1] - 2026-11-16
 
 ### Added
